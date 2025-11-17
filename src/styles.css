@@ -1,0 +1,114 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --font-sans: "Manrope", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --color-bg: 247 250 255;
+  --color-surface: 255 255 255;
+  --color-surface-alt: 230 242 255;
+  --color-ink: 12 36 66;
+  --color-muted: 91 110 141;
+  --color-border: 209 225 245;
+  --color-primary: 30 166 255;
+  --color-primary-dark: 23 115 238;
+  --color-on-primary: 255 255 255;
+  --color-accent: 235 66 95;
+  --color-on-accent: 255 255 255;
+  --color-success: 24 163 96;
+  --color-warning: 245 156 72;
+  --color-danger: 231 76 60;
+  --radius-base: 0.75rem;
+  --radius-lg: 1.2rem;
+  --radius-pill: 999px;
+  --elevation-soft: 0 18px 45px rgba(20, 88, 178, 0.15);
+  --gradient-primary: linear-gradient(135deg, #1ec8ff, #1b6dff);
+  --gradient-accent: linear-gradient(135deg, #ff7d8c, #f34760);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: 7 18 32;
+  --color-surface: 15 28 52;
+  --color-surface-alt: 24 44 78;
+  --color-ink: 234 243 255;
+  --color-muted: 159 178 207;
+  --color-border: 38 66 110;
+  --color-primary: 69 171 255;
+  --color-primary-dark: 32 119 255;
+  --color-accent: 255 120 140;
+  --color-success: 58 205 140;
+  --color-warning: 255 185 104;
+  --color-danger: 255 119 117;
+  --elevation-soft: 0 25px 55px rgba(6, 19, 41, 0.55);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    @apply bg-background text-ink antialiased;
+  }
+
+  ::selection {
+    color: rgb(var(--color-on-primary));
+    background: rgba(30, 166, 255, 0.35);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold text-ink tracking-tight;
+  }
+
+  p {
+    @apply text-base text-muted leading-relaxed;
+  }
+
+  a {
+    @apply text-brand font-medium transition-colors;
+  }
+
+  a:hover {
+    @apply text-brand-dark;
+  }
+
+  .app-shell {
+    @apply bg-surface text-ink rounded-2xl shadow-brand-soft;
+  }
+
+  .pill-button {
+    border-radius: var(--radius-pill);
+    @apply px-6 py-3 font-semibold text-sm uppercase tracking-wide text-brand-foreground bg-brand;
+    background-image: var(--gradient-primary);
+    box-shadow: var(--elevation-soft);
+  }
+
+  .pill-button--accent {
+    background-image: var(--gradient-accent);
+    @apply text-accent-foreground;
+  }
+
+  .card {
+    @apply bg-surface rounded-xl shadow-brand-soft border border-border/60 p-6;
+  }
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-xl border border-border/70 bg-surface px-4 py-3 text-lg text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-brand;
+  }
+
+  .checkbox {
+    @apply w-5 h-5 accent-brand rounded-md border border-border;
+  }
+}

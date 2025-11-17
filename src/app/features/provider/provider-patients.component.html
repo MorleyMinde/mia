@@ -1,0 +1,26 @@
+<section class="space-y-4 p-4">
+  <div class="rounded-2xl bg-surface px-4 py-3 shadow-brand-soft space-y-2">
+    <input type="text" [formControl]="filter" class="input" placeholder="Search name or code">
+    <div class="flex gap-2">
+      <input type="text" maxlength="8" class="input text-center text-lg tracking-[0.4em]" [formControl]="shareCodeControl" placeholder="CODE">
+      <button class="pill-button text-xs" type="button" (click)="addByShareCode()">Link</button>
+    </div>
+    <p class="text-xs text-danger" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+  </div>
+
+  <div class="space-y-2" *ngIf="filteredPatients().length; else emptyState">
+    <article *ngFor="let patient of filteredPatients()" class="rounded-2xl bg-surface px-4 py-3 shadow-brand-soft flex items-center justify-between">
+      <div>
+        <p class="text-lg font-semibold text-ink">{{ patient.displayName }}</p>
+        <p class="text-xs text-muted uppercase tracking-[0.4em]">Code {{ patient.shareCode }}</p>
+      </div>
+      <button class="pill-button text-xs px-3 py-2" type="button" (click)="viewAs(patient)">View</button>
+    </article>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="rounded-2xl border border-dashed border-border/70 p-6 text-center text-muted">
+      No linked patients.
+    </div>
+  </ng-template>
+</section>

@@ -1,0 +1,46 @@
+<div class="space-y-3 p-4">
+  <article class="rounded-3xl bg-surface p-4 shadow-brand-soft space-y-4" *ngIf="latestEntry(); else emptyState">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-[10px] uppercase tracking-[0.5em] text-muted">Today</p>
+        <p class="text-3xl font-semibold text-ink">{{ latestEntry()?.status | titlecase }}</p>
+      </div>
+      <span class="px-4 py-2 rounded-full text-xs font-semibold" [ngClass]="statusColor(latestEntry()?.status ?? 'green')">
+        {{ latestEntry()?.statusReasons?.[0] || 'All good' }}
+      </span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div class="mini-card">
+        <p>BP</p>
+        <h3>{{ latestEntry()?.bp?.sys || '--' }}/{{ latestEntry()?.bp?.dia || '--' }}</h3>
+        <small>mmHg</small>
+      </div>
+      <div class="mini-card">
+        <p>Glucose</p>
+        <h3>{{ latestEntry()?.glucose?.mmol || '--' }}</h3>
+        <small>mmol/L</small>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-2" *ngIf="latestEntry()?.actions?.length">
+      <span *ngFor="let action of latestEntry()?.actions" class="rounded-full bg-surface-muted/60 px-3 py-1 text-xs text-ink">
+        {{ action }}
+      </span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2">
+      <a routerLink="/patient/record" class="pill-button text-center text-base">
+        {{ hasTodayEntry() ? 'Update' : 'Record' }}
+      </a>
+      <a routerLink="/patient/history" class="pill-button pill-button--accent text-center text-base">History</a>
+    </div>
+  </article>
+
+  <ng-template #emptyState>
+    <div class="rounded-3xl border border-dashed border-border/70 bg-surface p-6 text-center space-y-3">
+      <p class="text-xl font-semibold text-ink">Let’s log today</p>
+      <a routerLink="/patient/record" class="pill-button inline-flex justify-center text-base">Record</a>
+    </div>
+  </ng-template>
+</div>

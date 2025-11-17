@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.input {
+  @apply w-full rounded-xl border border-border/60 bg-surface px-4 py-3 text-lg text-ink focus:outline-none focus:ring-2 focus:ring-brand;
+}
+
+.checkbox {
+  @apply w-6 h-6 accent-brand rounded-md border border-border;
+}
+
+.stack {
+  @apply rounded-3xl border border-border/70 bg-surface p-4 space-y-3 shadow-brand-soft;
+}
+
+.stack header {
+  @apply flex items-center justify-between text-xs uppercase tracking-[0.4em] text-muted;
+}
+
+.toggle {
+  @apply flex items-center gap-2 text-[11px] uppercase tracking-[0.3em];
+}

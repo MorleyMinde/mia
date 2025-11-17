@@ -1,0 +1,24 @@
+<section class="space-y-3 p-4">
+  <div class="flex items-center justify-between">
+    <h2 class="text-xl font-semibold text-ink">History</h2>
+    <span class="text-xs text-muted">{{ entries().length }} days</span>
+  </div>
+
+  <div *ngIf="entries().length; else empty" class="space-y-2">
+    <article *ngFor="let entry of entries()" class="rounded-2xl bg-surface shadow-brand-soft px-4 py-3 flex items-center justify-between">
+      <div>
+        <p class="text-lg font-semibold text-ink">{{ entry.date | date:'EEE d MMM' }}</p>
+        <p class="text-xs text-muted">BP {{ entry.bp?.sys || '--' }}/{{ entry.bp?.dia || '--' }}</p>
+      </div>
+      <span class="px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="statusBadge(entry.status)">
+        {{ entry.status | titlecase }}
+      </span>
+    </article>
+  </div>
+
+  <ng-template #empty>
+    <div class="rounded-2xl border border-dashed border-border/70 p-6 text-center text-muted">
+      Nothing logged yet.
+    </div>
+  </ng-template>
+</section>

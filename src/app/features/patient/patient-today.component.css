@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.mini-card {
+  @apply rounded-2xl bg-surface-muted/50 p-4 text-center;
+}
+
+.mini-card p {
+  @apply text-xs uppercase tracking-[0.4em] text-muted;
+}
+
+.mini-card h3 {
+  @apply text-2xl font-semibold text-ink;
+}
+
+.mini-card small {
+  @apply text-xs text-muted;
+}

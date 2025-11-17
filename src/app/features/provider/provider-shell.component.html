@@ -1,0 +1,25 @@
+<section class="flex flex-col min-h-full bg-background">
+  <div class="px-4 pt-4" *ngIf="viewingPatientId(); else idleState">
+    <div class="flex items-center justify-between rounded-2xl bg-brand/10 text-brand-dark px-4 py-2 text-sm">
+      <span>Viewing {{ viewingPatientId() }}</span>
+      <button class="text-brand font-semibold" (click)="exitViewAs()">Exit</button>
+    </div>
+  </div>
+  <ng-template #idleState>
+    <div class="px-4 pt-4 text-xs uppercase tracking-[0.4em] text-muted">Pick a patient</div>
+  </ng-template>
+
+  <div class="flex-1 overflow-y-auto">
+    <router-outlet />
+  </div>
+
+  <nav class="sticky bottom-0 w-full bg-surface border-t border-border/80 shadow-brand-soft px-4 py-2 flex justify-between text-xs uppercase tracking-[0.3em]">
+    <a *ngFor="let item of navItems"
+       [routerLink]="item.path"
+       routerLinkActive="text-brand font-semibold"
+       class="flex-1 text-center text-muted">
+      <span class="block text-lg">{{ item.icon }}</span>
+      {{ item.label }}
+    </a>
+  </nav>
+</section>

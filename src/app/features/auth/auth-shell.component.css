@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.field {
+  @apply flex flex-col gap-1 text-sm text-muted;
+}
+
+.field span {
+  @apply text-[11px] uppercase tracking-[0.3em];
+}
+
+.input {
+  @apply w-full rounded-2xl border border-border/70 bg-surface px-4 py-3 text-base text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-brand;
+}
+
+.checkbox {
+  @apply w-5 h-5 accent-brand rounded-md border border-border;
+}
+
+.chip {
+  @apply flex items-center gap-2 px-3 py-2 rounded-full bg-surface text-ink border border-border/70;
+}

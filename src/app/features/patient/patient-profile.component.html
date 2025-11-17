@@ -1,0 +1,27 @@
+<section *ngIf="profile(); else empty" class="space-y-4 p-4">
+  <div class="flex items-center gap-3">
+    <div class="w-16 h-16 rounded-2xl bg-brand-gradient flex items-center justify-center text-2xl text-white font-bold">
+      {{ profile()?.displayName?.[0] || '?' }}
+    </div>
+    <div>
+      <h2 class="text-xl font-semibold text-ink">{{ profile()?.displayName }}</h2>
+      <p class="text-xs text-muted uppercase tracking-[0.4em]">Code {{ profile()?.shareCode || '••••' }}</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-2">
+    <div class="stat-card">
+      <p>Birth</p>
+      <h3>{{ profile()?.yearOfBirth || '—' }}</h3>
+    </div>
+    <div class="stat-card">
+      <p>Conditions</p>
+      <h3>{{ profile()?.conditions?.length || 0 }}</h3>
+    </div>
+  </div>
+</section>
+
+<ng-template #empty>
+  <div class="rounded-2xl border border-dashed border-border/70 p-6 text-center text-muted">
+    No profile data yet.
+  </div>
+</ng-template>
