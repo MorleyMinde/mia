@@ -23,12 +23,25 @@ export class ProfileService {
 
   async upsertProfile(profile: UserProfile) {
     const reference = doc(this.firestore, 'users', profile.uid) as DocumentReference<UserProfile>;
-    await setDoc(reference, { ...profile, updatedAt: new Date(), createdAt: profile.createdAt ?? new Date() }, { merge: true });
+    const profileWithLowercase = {
+      ...profile,
+      displayNameLower: profile.displayName.toLowerCase(),
+      updatedAt: new Date(),
+      createdAt: profile.createdAt ?? new Date()
+    };
+    await setDoc(reference, profileWithLowercase, { merge: true });
   }
 
   async updatePartial(uid: string, patch: Partial<UserProfile>) {
     const reference = doc(this.firestore, 'users', uid) as DocumentReference<UserProfile>;
-    await updateDoc(reference, { ...patch, updatedAt: serverTimestamp() } as any);
+    const updateData: any = { ...patch, updatedAt: serverTimestamp() };
+    
+    // If displayName is being updated, also update displayNameLower
+    if ('displayName' in patch && patch.displayName) {
+      updateData.displayNameLower = patch.displayName.toLowerCase();
+    }
+    
+    await updateDoc(reference, updateData);
   }
 
   generateShareCode(): string {

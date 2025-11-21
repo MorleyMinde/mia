@@ -52,27 +52,31 @@ export class ProviderService {
     
     console.log('Searching for patients with term:', searchTerm);
     
-    // Use collectionData which is zone-aware and works properly with Angular
-    const patientsQuery = query(patientsCollection, where('role', '==', 'patient'));
+    // Convert search term to lowercase for querying
+    const searchLower = searchTerm.toLowerCase();
+    
+    // Use range query for prefix matching on displayNameLower field
+    // This queries directly in Firestore instead of filtering on the frontend
+    const patientsQuery = query(
+      patientsCollection,
+      where('role', '==', 'patient'),
+      where('displayNameLower', '>=', searchLower),
+      where('displayNameLower', '<=', searchLower + '\uf8ff')
+    );
     
     return new Observable<PatientProfile[]>((observer) => {
       collectionData(patientsQuery, { idField: 'uid' }).subscribe({
         next: (patients) => {
-          console.log('Total patients found in Firestore:', patients.length);
+          console.log('Patients found via Firestore query:', patients.length);
           
-          // Filter results client-side for case-insensitive partial match
-          const searchLower = searchTerm.toLowerCase();
-          const results = (patients as PatientProfile[])
-            .filter(patient => {
-              const matches = patient.displayName?.toLowerCase().includes(searchLower);
-              if (matches) {
-                console.log('Match found:', patient.displayName);
-              }
-              return matches;
-            })
-            .slice(0, 20); // Limit to 20 results
+          // Limit results to 20 for performance
+          const results = (patients as PatientProfile[]).slice(0, 20);
+          
+          results.forEach(patient => {
+            console.log('Match found:', patient.displayName);
+          });
 
-          console.log('Filtered results:', results.length);
+          console.log('Final results:', results.length);
           observer.next(results);
           observer.complete();
         },

@@ -16,6 +16,7 @@ export interface UserProfileBase {
   uid: string;
   role: UserRole;
   displayName: string;
+  displayNameLower: string; // Lowercase version for efficient searching
   lang: LanguageCode;
   phone?: string;
   shareCode?: string;

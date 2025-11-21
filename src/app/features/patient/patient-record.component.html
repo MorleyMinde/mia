@@ -301,18 +301,27 @@
     <textarea rows="3" formControlName="notes" class="input" placeholder="Any other observations or notes..."></textarea>
   </section>
 
-  <!-- Save Button -->
+  <!-- Action Buttons -->
   <div class="sticky bottom-4 space-y-2">
-    <button 
-      type="submit" 
-      class="pill-button w-full text-lg shadow-lg transition-all"
-      [disabled]="status() === 'saving' || status() === 'success'"
-      [class.opacity-50]="status() === 'saving'"
-      [class.bg-green-600]="status() === 'success'">
-      <span *ngIf="status() === 'idle' || status() === 'error'">💾 Save Entry</span>
-      <span *ngIf="status() === 'saving'">⏳ Saving...</span>
-      <span *ngIf="status() === 'success'">✅ Saved! Redirecting...</span>
-    </button>
+    <div class="grid grid-cols-2 gap-3">
+      <button 
+        type="button"
+        (click)="cancel()"
+        class="px-6 py-4 text-lg font-semibold rounded-2xl bg-surface border-2 border-border text-ink hover:bg-surface-muted/50 shadow-md hover:shadow-lg transition-all"
+        [disabled]="status() === 'saving' || status() === 'success'">
+        ← Cancel
+      </button>
+      <button 
+        type="submit" 
+        class="pill-button text-lg shadow-lg transition-all"
+        [disabled]="status() === 'saving' || status() === 'success'"
+        [class.opacity-50]="status() === 'saving'"
+        [class.bg-green-600]="status() === 'success'">
+        <span *ngIf="status() === 'idle' || status() === 'error'">💾 Save</span>
+        <span *ngIf="status() === 'saving'">⏳ Saving...</span>
+        <span *ngIf="status() === 'success'">✅ Saved!</span>
+      </button>
+    </div>
     <p class="text-center text-danger text-sm font-semibold" *ngIf="errorMessage()">
       ❌ {{ errorMessage() }}
     </p>

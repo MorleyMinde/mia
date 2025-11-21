@@ -179,6 +179,44 @@ export class PatientRecordComponent {
     this.newHerbInput.set(''); // Clear input after selection
   }
 
+  cancel() {
+    // Check if user has entered any data
+    const hasData = this.hasFormData();
+    
+    // If there's data, confirm before canceling
+    if (hasData) {
+      const confirmed = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
+      if (!confirmed) {
+        return;
+      }
+    }
+    
+    // Navigate back based on current role
+    const currentRole = this.creatorRole();
+    if (currentRole === 'provider') {
+      this.router.navigate(['/provider/dashboard']);
+    } else {
+      this.router.navigate(['/patient']);
+    }
+  }
+
+  private hasFormData(): boolean {
+    const raw = this.form.getRawValue();
+    return !!(
+      (raw.bp?.sys != null || raw.bp?.dia != null) ||
+      raw.glucose?.mmol != null ||
+      this.selectedMeds().length > 0 ||
+      raw.food?.notes ||
+      (raw.food?.salt !== 3) ||
+      (raw.food?.carb !== 3) ||
+      (raw.exercise?.minutes && raw.exercise.minutes > 0) ||
+      (raw.alcohol && raw.alcohol > 0) ||
+      (raw.cigarettes && raw.cigarettes > 0) ||
+      this.selectedHerbs().length > 0 ||
+      raw.notes
+    );
+  }
+
   async save() {
     if (this.form.invalid || !this.activePatientId()) {
       this.form.markAllAsTouched();
@@ -283,8 +321,14 @@ export class PatientRecordComponent {
       // Give Firestore a moment to propagate before navigating
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      console.log('Navigating to /patient');
-      await this.router.navigate(['/patient']);
+      // Navigate based on role
+      if (this.creatorRole() === 'provider') {
+        console.log('Navigating to /provider/dashboard');
+        await this.router.navigate(['/provider/dashboard']);
+      } else {
+        console.log('Navigating to /patient');
+        await this.router.navigate(['/patient']);
+      }
     } catch (error: any) {
       console.error('Error saving entry:', error);
       this.status.set('error');
