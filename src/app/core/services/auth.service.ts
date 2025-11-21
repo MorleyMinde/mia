@@ -10,7 +10,7 @@ import {
   updateProfile,
   User as FirebaseUser
 } from '@angular/fire/auth';
-import { from, lastValueFrom, Observable } from 'rxjs';
+import { filter, firstValueFrom, from, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -42,8 +42,9 @@ export class AuthService {
     return from(signInWithPopup(this.auth, this.provider).then((cred) => cred.user));
   }
 
-  signOut(): Promise<void> {
-    return signOut(this.auth);
+  async signOut(): Promise<void> {
+    await signOut(this.auth);
+    this._user.set(null);
   }
 
   async requireUser(): Promise<FirebaseUser> {
@@ -51,10 +52,9 @@ export class AuthService {
     if (current) {
       return current;
     }
-    const awaited = await lastValueFrom(authState(this.auth));
-    if (!awaited) {
-      throw new Error('User not authenticated');
-    }
+    const awaited = await firstValueFrom(
+      authState(this.auth).pipe(filter((user): user is FirebaseUser => !!user))
+    );
     return awaited;
   }
 }

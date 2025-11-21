@@ -1,9 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { DailyEntry } from '../../core/models/daily-entry.model';
+import { HealthEntry } from '../../core/models/daily-entry.model';
 import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
 import { EntryService } from '../../core/services/entry.service';
+
+interface DayGroup {
+  date: Date;
+  dateString: string;
+  entries: HealthEntry[];
+  worstStatus: 'green' | 'yellow' | 'red';
+}
 
 @Component({
   selector: 'app-patient-history',
@@ -17,8 +24,62 @@ export class PatientHistoryComponent {
   private readonly context = inject(ContextService);
   private readonly authService = inject(AuthService);
 
-  readonly entries = signal<DailyEntry[]>([]);
+  readonly entries = signal<HealthEntry[]>([]);
   readonly activePatientId = computed(() => this.context.context().actingAsPatientId ?? this.authService.user()?.uid ?? null);
+  
+  readonly groupedEntries = computed(() => {
+    const entries = this.entries();
+    const groups = new Map<string, DayGroup>();
+    
+    entries.forEach(entry => {
+      // Skip entries with invalid timestamps
+      if (!entry.timestamp) return;
+      
+      // Ensure we have a valid Date object
+      let timestamp: Date;
+      if (entry.timestamp instanceof Date) {
+        timestamp = entry.timestamp;
+      } else if (typeof entry.timestamp === 'object' && 'toDate' in entry.timestamp) {
+        // Handle Firestore Timestamp
+        timestamp = (entry.timestamp as any).toDate();
+      } else {
+        timestamp = new Date(entry.timestamp);
+      }
+      
+      // Validate the date is valid
+      if (isNaN(timestamp.getTime())) {
+        console.warn('Invalid timestamp for entry:', entry);
+        return;
+      }
+      
+      const date = new Date(timestamp);
+      date.setHours(0, 0, 0, 0);
+      const dateString = date.toISOString().split('T')[0];
+      
+      if (!groups.has(dateString)) {
+        groups.set(dateString, {
+          date,
+          dateString,
+          entries: [],
+          worstStatus: 'green'
+        });
+      }
+      
+      const group = groups.get(dateString)!;
+      group.entries.push(entry);
+      
+      // Update worst status
+      if (entry.status === 'red') {
+        group.worstStatus = 'red';
+      } else if (entry.status === 'yellow' && group.worstStatus === 'green') {
+        group.worstStatus = 'yellow';
+      }
+    });
+    
+    return Array.from(groups.values()).sort((a, b) => b.date.getTime() - a.date.getTime());
+  });
+
+  readonly expandedDays = signal<Set<string>>(new Set());
 
   constructor() {
     effect((onCleanup) => {
@@ -32,6 +93,21 @@ export class PatientHistoryComponent {
     });
   }
 
+  toggleDay(dateString: string) {
+    const expanded = this.expandedDays();
+    const newExpanded = new Set(expanded);
+    if (newExpanded.has(dateString)) {
+      newExpanded.delete(dateString);
+    } else {
+      newExpanded.add(dateString);
+    }
+    this.expandedDays.set(newExpanded);
+  }
+
+  isDayExpanded(dateString: string): boolean {
+    return this.expandedDays().has(dateString);
+  }
+
   statusBadge(status: string): string {
     switch (status) {
       case 'red':
@@ -41,5 +117,9 @@ export class PatientHistoryComponent {
       default:
         return 'bg-green-100 text-green-900';
     }
+  }
+
+  formatTime(timestamp: Date): string {
+    return new Date(timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   }
 }

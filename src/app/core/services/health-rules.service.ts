@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DailyEntry, EntryStatus } from '../models/daily-entry.model';
+import { HealthEntry, EntryStatus } from '../models/daily-entry.model';
 import { PatientThresholds } from '../models/user-profile.model';
 
 export interface ComputedStatusResult {
@@ -9,7 +9,7 @@ export interface ComputedStatusResult {
 
 @Injectable({ providedIn: 'root' })
 export class HealthRulesService {
-  computeStatus(entry: DailyEntry, thresholds: PatientThresholds): ComputedStatusResult {
+  computeStatus(entry: HealthEntry, thresholds: PatientThresholds): ComputedStatusResult {
     const reasons: string[] = [];
     let status: EntryStatus = 'green';
 
@@ -56,7 +56,7 @@ export class HealthRulesService {
     return { status, reasons };
   }
 
-  computeRiskScore(entry: DailyEntry, thresholds: PatientThresholds): number {
+  computeRiskScore(entry: HealthEntry, thresholds: PatientThresholds): number {
     let score = 10;
     if (entry.bp) {
       score += (entry.bp.sys - thresholds.bpSysHigh) * 0.5;
@@ -73,7 +73,7 @@ export class HealthRulesService {
     return Math.max(0, Math.round(score));
   }
 
-  generateActions(entry: DailyEntry, result: ComputedStatusResult): string[] {
+  generateActions(entry: HealthEntry, result: ComputedStatusResult): string[] {
     const actions: string[] = [];
     if (result.status === 'red') {
       actions.push('actions.contactProvider');

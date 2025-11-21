@@ -1,8 +1,7 @@
 <section class="p-4 sm:p-6 space-y-5">
   <div class="text-center space-y-1">
-    <p class="text-[11px] uppercase tracking-[0.5em] text-muted">Easy check-in</p>
     <h2 class="text-2xl font-semibold text-ink">Sign {{ mode() === 'signup' ? 'up' : 'in' }}</h2>
-  </div>
+    </div>
 
   <div class="rounded-full bg-surface-muted/60 p-1 flex">
     <button type="button"
@@ -27,8 +26,11 @@
     </button>
   </div>
 
-  <form class="space-y-3" (ngSubmit)="submit()" *ngIf="selectedRole() as role" [formGroup]="onboardingForm">
-    <label class="field">
+  <form class="space-y-3" (ngSubmit)="submit()" [formGroup]="onboardingForm">
+    <div class="error-banner" *ngIf="errorMessage()">
+      {{ errorMessage() }}
+    </div>
+    <label class="field" *ngIf="mode() === 'signup'">
       <span>Display name</span>
       <input formControlName="displayName" type="text" class="input" placeholder="Mama Asha" autocomplete="name">
     </label>
@@ -38,10 +40,10 @@
       <input formControlName="email" type="email" class="input" placeholder="you@email.com" autocomplete="email">
     </label>
 
-    <label class="field" *ngIf="mode() === 'signup'">
+    <label class="field">
       <span>Password</span>
-      <input formControlName="password" type="password" class="input" autocomplete="new-password">
-    </label>
+      <input formControlName="password" type="password" class="input" [attr.autocomplete]="mode() === 'signup' ? 'new-password' : 'current-password'">
+      </label>
 
     <div class="grid grid-cols-2 gap-3">
       <label class="field">
@@ -57,12 +59,12 @@
       </label>
     </div>
 
-    <label class="field" *ngIf="role === 'patient' && mode() === 'signup'">
+    <label class="field" *ngIf="selectedRole() === 'patient' && mode() === 'signup'">
       <span>Year of birth</span>
-      <input formControlName="yearOfBirth" type="number" min="1930" max="2020" class="input">
-    </label>
+        <input formControlName="yearOfBirth" type="number" min="1930" max="2020" class="input">
+      </label>
 
-    <div class="rounded-2xl border border-border/70 p-3 space-y-2 text-sm" *ngIf="role === 'patient' && mode() === 'signup'" formGroupName="conditions">
+    <div class="rounded-2xl border border-border/70 p-3 space-y-2 text-sm" *ngIf="selectedRole() === 'patient' && mode() === 'signup'" formGroupName="conditions">
       <div class="flex items-center justify-between text-xs uppercase tracking-wide">
         <span class="text-muted">Conditions</span>
         <span class="text-brand font-semibold">Code: {{ onboardingForm.get('shareCode')?.value || '••••••' }}</span>
@@ -79,17 +81,6 @@
       </div>
     </div>
 
-    <div class="rounded-2xl border border-border/70 p-3 space-y-2 text-sm" *ngIf="role === 'provider' && mode() === 'signup'">
-      <label class="field">
-        <span>Facility</span>
-        <input type="text" formControlName="facilityName" class="input">
-      </label>
-      <label class="field">
-        <span>Role</span>
-        <input type="text" formControlName="providerType" class="input" placeholder="Doctor">
-      </label>
-    </div>
-
     <div class="space-y-2 pt-2">
       <button type="submit" class="pill-button w-full text-lg">
         {{ mode() === 'signup' ? 'Create account' : 'Continue' }}
@@ -98,7 +89,5 @@
         Continue with Google
       </button>
     </div>
-
-    <p class="text-center text-sm text-danger" *ngIf="errorMessage()">{{ errorMessage() }}</p>
   </form>
 </section>

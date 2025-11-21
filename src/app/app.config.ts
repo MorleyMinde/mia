@@ -25,6 +25,7 @@ export const appConfig: ApplicationConfig = {
       const firestore = getFirestore();
       if (environment.useEmulators && !connectedEmulators.firestore) {
         try {
+          console.log('Connecting to Firestore emulator:', environment.emulators.firestore);
           connectFirestoreEmulator(firestore, environment.emulators.firestore.host, environment.emulators.firestore.port);
           connectedEmulators.firestore = true;
         } catch (error) {

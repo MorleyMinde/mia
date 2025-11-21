@@ -1,0 +1,30 @@
+<section class="space-y-4 p-4" *ngIf="profile(); else empty">
+  <div class="flex items-center gap-3">
+    <div class="w-16 h-16 rounded-2xl bg-brand-gradient flex items-center justify-center text-2xl text-white font-bold">
+      {{ profile()?.displayName?.[0] || 'U' }}
+    </div>
+    <div>
+      <p class="text-xs uppercase tracking-[0.4em] text-muted">Provider</p>
+      <h2 class="text-2xl font-semibold text-ink">{{ profile()?.displayName }}</h2>
+      <p class="text-sm text-muted">{{ displayEmail() }}</p>
+    </div>
+  </div>
+
+  <div class="rounded-2xl bg-surface-muted/60 p-4 space-y-2">
+    <p class="text-sm text-muted">Use “My Patients” to search by name or share code, then jump into Today/Record to help them log entries.</p>
+    <div class="grid grid-cols-2 gap-2 text-sm text-muted">
+      <span>Language</span>
+      <span class="text-ink font-semibold">{{ profile()?.lang | uppercase }}</span>
+      <span>Phone</span>
+      <span class="text-ink font-semibold">{{ profile()?.phone || '—' }}</span>
+    </div>
+  </div>
+
+  <button type="button" class="pill-button w-full text-lg" (click)="logout()">Log out</button>
+</section>
+
+<ng-template #empty>
+  <div class="rounded-2xl border border-dashed border-border/70 p-6 text-center text-muted">
+    No profile data.
+  </div>
+</ng-template>

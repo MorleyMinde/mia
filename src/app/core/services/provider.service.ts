@@ -46,4 +46,41 @@ export class ProviderService {
     const reference = doc(this.firestore, 'providers', providerId, 'patients', patientId) as DocumentReference<ProviderPatientLink>;
     await setDoc(reference, { providerId, patientId, createdAt: new Date() });
   }
+
+  searchPatientsByName(searchTerm: string): Observable<PatientProfile[]> {
+    const patientsCollection = collection(this.firestore, 'users') as CollectionReference<UserProfile>;
+    
+    console.log('Searching for patients with term:', searchTerm);
+    
+    // Use collectionData which is zone-aware and works properly with Angular
+    const patientsQuery = query(patientsCollection, where('role', '==', 'patient'));
+    
+    return new Observable<PatientProfile[]>((observer) => {
+      collectionData(patientsQuery, { idField: 'uid' }).subscribe({
+        next: (patients) => {
+          console.log('Total patients found in Firestore:', patients.length);
+          
+          // Filter results client-side for case-insensitive partial match
+          const searchLower = searchTerm.toLowerCase();
+          const results = (patients as PatientProfile[])
+            .filter(patient => {
+              const matches = patient.displayName?.toLowerCase().includes(searchLower);
+              if (matches) {
+                console.log('Match found:', patient.displayName);
+              }
+              return matches;
+            })
+            .slice(0, 20); // Limit to 20 results
+
+          console.log('Filtered results:', results.length);
+          observer.next(results);
+          observer.complete();
+        },
+        error: (error) => {
+          console.error('Firestore error:', error);
+          observer.error(error);
+        }
+      });
+    });
+  }
 }

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { DailyEntry } from '../../core/models/daily-entry.model';
+import { HealthEntry } from '../../core/models/daily-entry.model';
 import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
 import { EntryService } from '../../core/services/entry.service';
@@ -18,7 +18,7 @@ export class PatientInsightsComponent {
   private readonly context = inject(ContextService);
   private readonly authService = inject(AuthService);
 
-  readonly entries = signal<DailyEntry[]>([]);
+  readonly entries = signal<HealthEntry[]>([]);
   readonly activePatientId = computed(() => this.context.context().actingAsPatientId ?? this.authService.user()?.uid ?? null);
 
   readonly streakDays = computed(() => this.computeStreak(this.entries()));
@@ -38,17 +38,29 @@ export class PatientInsightsComponent {
     });
   }
 
-  private computeStreak(entries: DailyEntry[]): number {
+  private computeStreak(entries: HealthEntry[]): number {
     if (!entries.length) return 0;
+    
+    // Group entries by date
+    const dateMap = new Map<string, HealthEntry[]>();
+    entries.forEach(entry => {
+      const date = new Date(entry.timestamp);
+      date.setHours(0, 0, 0, 0);
+      const dateStr = date.toISOString().split('T')[0];
+      if (!dateMap.has(dateStr)) {
+        dateMap.set(dateStr, []);
+      }
+      dateMap.get(dateStr)!.push(entry);
+    });
+    
+    // Count consecutive days with entries
     let streak = 0;
     let currentDate = new Date();
-    for (const entry of entries) {
-      const entryDate = new Date(entry.date);
-      if (
-        entryDate.getFullYear() === currentDate.getFullYear() &&
-        entryDate.getMonth() === currentDate.getMonth() &&
-        entryDate.getDate() === currentDate.getDate()
-      ) {
+    currentDate.setHours(0, 0, 0, 0);
+    
+    while (true) {
+      const dateStr = currentDate.toISOString().split('T')[0];
+      if (dateMap.has(dateStr)) {
         streak++;
         currentDate.setDate(currentDate.getDate() - 1);
       } else {

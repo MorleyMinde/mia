@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.patients-card {
+  @apply h-full space-y-5;
+}
+
+.patients-card h2 {
+  @apply text-3xl font-semibold text-ink;
+}
+
+.patients-card p {
+  @apply text-base text-muted;
+}
+
+.search-box {
+  @apply rounded-[2rem] bg-white shadow-brand-soft p-4 space-y-3 border border-border/40;
+}
+
+.search-box .actions {
+  @apply flex gap-2;
+}
+
+.patient-chip {
+  @apply rounded-[1.5rem] bg-surface shadow-brand-soft px-4 py-3 flex items-center justify-between;
+}
+
+.patient-chip button {
+  @apply rounded-full bg-brand-gradient text-white text-xs font-semibold px-4 py-2;
+}

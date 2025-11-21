@@ -1,0 +1,118 @@
+<div *ngIf="loading()" class="flex items-center justify-center p-12">
+  <p class="text-muted">Loading patient data...</p>
+</div>
+
+<div *ngIf="!loading() && profile()" class="space-y-6">
+  <!-- Patient Info Header -->
+  <section class="bg-gradient-to-r from-brand/5 to-brand/10 rounded-2xl p-6 border border-brand/20">
+    <div class="flex items-center gap-4 mb-4">
+      <div class="w-16 h-16 rounded-2xl bg-brand-gradient flex items-center justify-center text-2xl text-white font-bold flex-shrink-0">
+        {{ profile()?.displayName?.[0] || '?' }}
+      </div>
+      <div class="min-w-0 flex-1">
+        <h2 class="text-2xl font-bold text-ink break-words">{{ profile()?.displayName }}</h2>
+        <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm">
+          <span class="text-muted">Age: <strong>{{ getAge(profile()?.yearOfBirth) }}</strong></span>
+          <span class="text-muted">Conditions: <strong>{{ profile()?.conditions?.join(', ') || 'None' }}</strong></span>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="pill-button w-full" (click)="goToRecord()">
+      ✍️ Record Entry
+    </button>
+  </section>
+
+  <!-- Current Status -->
+  <section *ngIf="latestEntry()" class="bg-surface rounded-2xl shadow-md border border-border/40 p-6">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-lg font-bold text-ink">Latest Status</h3>
+        <p class="text-sm text-muted">{{ latestEntry()?.timestamp | date:'fullDate' }} at {{ latestEntry()?.timestamp | date:'shortTime' }}</p>
+      </div>
+      <span class="px-4 py-2 rounded-full text-sm font-bold" [ngClass]="statusBadge(latestEntry()?.status ?? 'green')">
+        {{ latestEntry()?.status | uppercase }}
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+      <div class="bg-background/50 rounded-xl p-4 text-center">
+        <p class="text-xs text-muted uppercase tracking-wide mb-1">Blood Pressure</p>
+        <p class="text-3xl font-bold text-ink">
+          {{ latestEntry()?.bp?.sys || '--' }}<span class="text-lg">/</span>{{ latestEntry()?.bp?.dia || '--' }}
+        </p>
+        <p class="text-xs text-muted mt-1">mmHg</p>
+      </div>
+      <div class="bg-background/50 rounded-xl p-4 text-center">
+        <p class="text-xs text-muted uppercase tracking-wide mb-1">Glucose</p>
+        <p class="text-3xl font-bold text-ink">{{ latestEntry()?.glucose?.mmol || '--' }}</p>
+        <p class="text-xs text-muted mt-1">mmol/L</p>
+      </div>
+      <div class="bg-background/50 rounded-xl p-4 text-center">
+        <p class="text-xs text-muted uppercase tracking-wide mb-1">Meds</p>
+        <p class="text-3xl font-bold" [class.text-success]="latestEntry()?.meds?.taken" [class.text-danger]="!latestEntry()?.meds?.taken">
+          {{ latestEntry()?.meds?.taken ? '✓' : '✗' }}
+        </p>
+        <p class="text-xs text-muted mt-1">{{ latestEntry()?.meds?.taken ? 'Taken' : 'Missed' }}</p>
+      </div>
+    </div>
+
+    <div *ngIf="latestEntry()?.actions?.length" class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+      <p class="text-sm font-semibold text-amber-900 mb-2">📌 Recommended Actions</p>
+      <ul class="space-y-1">
+        <li *ngFor="let action of latestEntry()?.actions" class="text-sm text-amber-800">• {{ action }}</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Insights Grid -->
+  <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-surface rounded-2xl shadow-md border border-border/40 p-4 text-center">
+      <p class="text-xs text-muted uppercase tracking-wide mb-2">Streak</p>
+      <p class="text-3xl font-bold text-ink">{{ streakDays() }}</p>
+      <p class="text-xs text-muted mt-1">days</p>
+    </div>
+    <div class="bg-surface rounded-2xl shadow-md border border-border/40 p-4 text-center">
+      <p class="text-xs text-muted uppercase tracking-wide mb-2">Missed Meds</p>
+      <p class="text-3xl font-bold text-danger">{{ missedMeds() }}</p>
+      <p class="text-xs text-muted mt-1">times</p>
+    </div>
+    <div class="bg-surface rounded-2xl shadow-md border border-border/40 p-4 text-center">
+      <p class="text-xs text-muted uppercase tracking-wide mb-2">Avg SYS</p>
+      <p class="text-3xl font-bold text-ink">{{ avgSys() }}</p>
+      <p class="text-xs text-muted mt-1">mmHg</p>
+    </div>
+    <div class="bg-surface rounded-2xl shadow-md border border-border/40 p-4 text-center">
+      <p class="text-xs text-muted uppercase tracking-wide mb-2">Avg Glucose</p>
+      <p class="text-3xl font-bold text-ink">{{ avgGlucose() }}</p>
+      <p class="text-xs text-muted mt-1">mmol/L</p>
+    </div>
+  </section>
+
+  <!-- Recent History -->
+  <section class="bg-surface rounded-2xl shadow-md border border-border/40 p-6">
+    <h3 class="text-lg font-bold text-ink mb-4">Recent History</h3>
+    <div *ngIf="recentEntries().length; else noHistory" class="space-y-2">
+      <div *ngFor="let entry of recentEntries()" 
+           class="flex items-center justify-between p-3 bg-background/50 rounded-xl hover:bg-background transition-colors">
+        <div class="flex-1">
+          <p class="font-semibold text-ink">{{ entry.timestamp | date:'EEE, MMM d' }} at {{ entry.timestamp | date:'shortTime' }}</p>
+          <p class="text-sm text-muted">
+            BP: {{ entry.bp?.sys || '--' }}/{{ entry.bp?.dia || '--' }} · 
+            Glucose: {{ entry.glucose?.mmol || '--' }}
+          </p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs font-bold" [ngClass]="statusBadge(entry.status)">
+          {{ entry.status | uppercase }}
+        </span>
+      </div>
+    </div>
+    <ng-template #noHistory>
+      <p class="text-center text-muted py-8">No entries yet</p>
+    </ng-template>
+  </section>
+</div>
+
+<div *ngIf="!loading() && !profile()" class="text-center py-12">
+  <p class="text-muted">No patient selected</p>
+</div>
+

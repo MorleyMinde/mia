@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+.text-success {
+  color: rgb(34, 197, 94);
+}
+
+.text-danger {
+  color: rgb(239, 68, 68);
+}
+

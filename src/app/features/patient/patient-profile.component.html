@@ -18,6 +18,7 @@
       <h3>{{ profile()?.conditions?.length || 0 }}</h3>
     </div>
   </div>
+  <button *ngIf="canLogout()" type="button" class="pill-button w-full text-lg" (click)="logout()">Log out</button>
 </section>
 
 <ng-template #empty>

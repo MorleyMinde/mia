@@ -4,17 +4,16 @@ export type EntryCreatorRole = 'patient' | 'provider';
 export interface BloodPressurePayload {
   sys: number;
   dia: number;
-  time?: string;
 }
 
 export interface GlucosePayload {
   mmol: number;
   context: 'fasting' | 'random';
-  time?: string;
 }
 
-export interface DailyEntry {
-  date: string; // YYYY-MM-DD
+export interface HealthEntry {
+  id?: string; // Auto-generated timestamp-based ID
+  timestamp: Date; // Full date and time when the measurement was taken
   bp?: BloodPressurePayload;
   glucose?: GlucosePayload;
   meds?: { taken: boolean; names?: string[] };
@@ -33,3 +32,6 @@ export interface DailyEntry {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// Legacy type alias for backwards compatibility
+export type DailyEntry = HealthEntry;

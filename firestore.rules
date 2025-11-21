@@ -1,10 +1,59 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write access to all users (adjust these rules for production)
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    // User profiles
+    match /users/{userId} {
+      allow read: if request.auth != null && (
+        request.auth.uid == userId || 
+        isProviderLinkedToPatient(userId)
+      );
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Health entries (can be multiple per day with timestamps)
+    match /users/{userId}/entries/{entryId} {
+      allow read: if request.auth != null && (
+        request.auth.uid == userId || 
+        isProviderLinkedToPatient(userId)
+      );
+      allow create: if request.auth != null && (
+        request.auth.uid == userId || 
+        isProviderLinkedToPatient(userId)
+      ) && validateEntry();
+      allow update: if request.auth != null && (
+        request.auth.uid == userId || 
+        isProviderLinkedToPatient(userId)
+      ) && validateEntry();
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Provider links
+    match /users/{userId}/providerLinks/{linkId} {
+      allow read: if request.auth != null && (
+        request.auth.uid == userId || 
+        request.auth.uid == resource.data.providerId
+      );
+      allow write: if request.auth != null && (
+        request.auth.uid == userId || 
+        request.auth.uid == request.resource.data.providerId
+      );
+    }
+
+    // Helper functions
+    function isProviderLinkedToPatient(patientId) {
+      return exists(/databases/$(database)/documents/users/$(patientId)/providerLinks/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(patientId)/providerLinks/$(request.auth.uid)).data.status == 'active';
+    }
+
+    function validateEntry() {
+      let data = request.resource.data;
+      return data.timestamp is timestamp &&
+             data.status in ['green', 'yellow', 'red'] &&
+             data.createdByRole in ['patient', 'provider'] &&
+             data.createdByUid is string &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
     }
   }
-}
-
+}*/

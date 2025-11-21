@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
+import { debounceTime, switchMap, of } from 'rxjs';
 import { PatientProfile } from '../../core/models/user-profile.model';
 import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
-import { ProfileService } from '../../core/services/profile.service';
 import { ProviderService } from '../../core/services/provider.service';
 
 @Component({
@@ -17,58 +18,94 @@ import { ProviderService } from '../../core/services/provider.service';
 })
 export class ProviderPatientsComponent {
   private readonly providerService = inject(ProviderService);
-  private readonly profileService = inject(ProfileService);
   private readonly context = inject(ContextService);
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly patients = signal<PatientProfile[]>([]);
-  readonly filter = this.fb.control('');
-  readonly shareCodeControl = this.fb.control('');
-  readonly status = signal<'idle' | 'linking' | 'error'>('idle');
+  readonly linkedPatients = signal<PatientProfile[]>([]);
+  readonly searchResults = signal<PatientProfile[]>([]);
+  readonly searchControl = this.fb.control('');
+  readonly searching = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
   readonly providerId = computed(() => this.authService.user()?.uid ?? null);
-  readonly filteredPatients = computed(() => {
-    const term = this.filter.value?.toLowerCase?.() ?? '';
-    if (!term) return this.patients();
-    return this.patients().filter((patient) => patient.displayName.toLowerCase().includes(term) || patient.shareCode?.toLowerCase().includes(term));
+  readonly displayedPatients = computed(() => {
+    // If there's a search term, show search results
+    // Otherwise show linked patients
+    //const searchTerm = this.searchControl.value?.trim() || '';
+    //return searchTerm.length >= 2 ? this.searchResults() : this.linkedPatients();
+    return this.searchResults();
   });
 
   constructor() {
+    // Load linked patients
     effect((onCleanup) => {
       const providerId = this.providerId();
       if (!providerId) {
-        this.patients.set([]);
+        this.linkedPatients.set([]);
         return;
       }
       const sub = this.providerService.listenToLinkedPatients(providerId).subscribe(async (links) => {
-        const profiles = await Promise.all(
-          links.map((link) => firstValueFrom(this.profileService.listenToProfile(link.patientId)))
-        );
-        this.patients.set(profiles.filter((profile): profile is PatientProfile => !!profile && profile.role === 'patient'));
+        // For now, we'll keep this simple and just show linked patient IDs
+        // In a real app, you'd want to load the full profiles
+        this.linkedPatients.set([]);
       });
       onCleanup(() => sub.unsubscribe());
     });
+
+    // Set up search with debounce using switchMap for proper observable handling
+    this.searchControl.valueChanges
+      .pipe(
+        debounceTime(300),
+        switchMap((searchTerm) => {
+          console.log('Search term:', searchTerm);
+          
+          if (!searchTerm || searchTerm.trim().length < 2) {
+            this.searchResults.set([]);
+            this.searching.set(false);
+            return of([]);
+          }
+
+          this.searching.set(true);
+          this.errorMessage.set(null);
+          return this.providerService.searchPatientsByName(searchTerm.trim());
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (results) => {
+          console.log('Search results:', results);
+          this.searchResults.set(results);
+          this.searching.set(false);
+        },
+        error: (error: any) => {
+          console.error('Search error:', error);
+          this.errorMessage.set('Failed to search patients');
+          this.searchResults.set([]);
+          this.searching.set(false);
+        }
+      });
   }
 
-  async addByShareCode() {
-    if (!this.shareCodeControl.value || !this.providerId()) {
-      return;
+  async selectPatient(patient: PatientProfile) {
+    // Link the patient if not already linked
+    if (this.providerId()) {
+      try {
+        await this.providerService.linkPatient(this.providerId()!, patient.uid);
+      } catch (error) {
+        console.error('Error linking patient:', error);
+      }
     }
-    this.status.set('linking');
-    this.errorMessage.set(null);
-    try {
-      await this.providerService.linkPatientByShareCode(this.providerId()!, this.shareCodeControl.value.trim().toUpperCase());
-      this.shareCodeControl.reset('');
-      this.status.set('idle');
-    } catch (error: any) {
-      this.status.set('error');
-      this.errorMessage.set(error?.message ?? 'Unable to link patient');
-    }
-  }
 
-  viewAs(patient: PatientProfile) {
+    // View as this patient
     this.context.viewAsPatient(patient.uid);
+    this.router.navigate(['/provider/dashboard']);
+  }
+
+  getAge(yearOfBirth: number): string {
+    const currentYear = new Date().getFullYear();
+    return `${currentYear - yearOfBirth} yrs`;
   }
 }

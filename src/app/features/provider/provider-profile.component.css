@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.stat-card {
+  @apply rounded-2xl bg-surface shadow-brand-soft p-4 text-center space-y-1;
+}
+
+.stat-card p {
+  @apply text-[11px] uppercase tracking-[0.4em] text-muted;
+}
+
+.stat-card h3 {
+  @apply text-xl font-semibold text-ink;
+}

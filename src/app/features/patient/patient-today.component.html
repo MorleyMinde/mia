@@ -1,46 +1,91 @@
 <div class="space-y-3 p-4">
-  <article class="rounded-3xl bg-surface p-4 shadow-brand-soft space-y-4" *ngIf="latestEntry(); else emptyState">
+  <!-- Overall Status Card -->
+  <article class="rounded-3xl bg-surface p-4 shadow-brand-soft space-y-4" *ngIf="todayEntries().length > 0; else emptyState">
     <div class="flex items-center justify-between">
       <div>
-        <p class="text-[10px] uppercase tracking-[0.5em] text-muted">Today</p>
-        <p class="text-3xl font-semibold text-ink">{{ latestEntry()?.status | titlecase }}</p>
+        <p class="text-[10px] uppercase tracking-[0.5em] text-muted">Today's Status</p>
+        <p class="text-3xl font-semibold text-ink">{{ overallStatus() | titlecase }}</p>
       </div>
-      <span class="px-4 py-2 rounded-full text-xs font-semibold" [ngClass]="statusColor(latestEntry()?.status ?? 'green')">
-        {{ latestEntry()?.statusReasons?.[0] || 'All good' }}
-      </span>
+      <div class="text-right">
+        <span class="px-4 py-2 rounded-full text-xs font-semibold" [ngClass]="statusColor(overallStatus())">
+          {{ todayEntries().length }} {{ todayEntries().length === 1 ? 'entry' : 'entries' }}
+        </span>
+      </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
+    <!-- Latest Entry Summary -->
+    <div class="grid grid-cols-2 gap-3" *ngIf="latestEntry()">
       <div class="mini-card">
-        <p>BP</p>
+        <p>Latest BP</p>
         <h3>{{ latestEntry()?.bp?.sys || '--' }}/{{ latestEntry()?.bp?.dia || '--' }}</h3>
-        <small>mmHg</small>
+        <small>{{ formatTime(latestEntry()?.timestamp) }}</small>
       </div>
       <div class="mini-card">
-        <p>Glucose</p>
+        <p>Latest Glucose</p>
         <h3>{{ latestEntry()?.glucose?.mmol || '--' }}</h3>
-        <small>mmol/L</small>
+        <small>{{ formatTime(latestEntry()?.timestamp) }}</small>
       </div>
     </div>
 
+    <!-- Actions from latest entry -->
     <div class="flex flex-wrap gap-2" *ngIf="latestEntry()?.actions?.length">
       <span *ngFor="let action of latestEntry()?.actions" class="rounded-full bg-surface-muted/60 px-3 py-1 text-xs text-ink">
         {{ action }}
       </span>
     </div>
-
-    <div class="grid grid-cols-2 gap-2">
-      <a routerLink="/patient/record" class="pill-button text-center text-base">
-        {{ hasTodayEntry() ? 'Update' : 'Record' }}
-      </a>
-      <a routerLink="/patient/history" class="pill-button pill-button--accent text-center text-base">History</a>
-    </div>
   </article>
+
+  <!-- Today's Entries List -->
+  <section class="space-y-2" *ngIf="todayEntries().length > 0">
+    <h3 class="text-sm font-semibold text-ink px-2">Today's Entries</h3>
+    <div class="space-y-2">
+      <article 
+        *ngFor="let entry of todayEntries()" 
+        class="rounded-2xl bg-surface shadow-brand-soft p-3 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-semibold text-ink">{{ formatTime(entry.timestamp) }}</span>
+          <span class="px-2 py-1 rounded-full text-xs font-semibold" [ngClass]="statusColor(entry.status)">
+            {{ entry.status | titlecase }}
+          </span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-xs">
+          <div *ngIf="entry.bp">
+            <p class="text-muted">BP</p>
+            <p class="font-semibold">{{ entry.bp.sys }}/{{ entry.bp.dia }}</p>
+          </div>
+          <div *ngIf="entry.glucose">
+            <p class="text-muted">Glucose</p>
+            <p class="font-semibold">{{ entry.glucose.mmol }} <span class="text-muted text-[10px]">{{ entry.glucose.context }}</span></p>
+          </div>
+          <div *ngIf="entry.exercise">
+            <p class="text-muted">Exercise</p>
+            <p class="font-semibold">{{ entry.exercise.minutes }}min</p>
+          </div>
+          <div *ngIf="entry.meds">
+            <p class="text-muted">Meds</p>
+            <p class="font-semibold">{{ entry.meds.taken ? '✓' : '✗' }}</p>
+          </div>
+        </div>
+        <p class="text-xs text-muted" *ngIf="entry.notes">{{ entry.notes }}</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Action Buttons -->
+  <div class="grid grid-cols-2 gap-2">
+    <a routerLink="/patient/record" class="pill-button text-center text-base">
+      + Add Entry
+    </a>
+    <a routerLink="/patient/history" class="pill-button pill-button--accent text-center text-base">
+      View History
+    </a>
+  </div>
 
   <ng-template #emptyState>
     <div class="rounded-3xl border border-dashed border-border/70 bg-surface p-6 text-center space-y-3">
-      <p class="text-xl font-semibold text-ink">Let’s log today</p>
-      <a routerLink="/patient/record" class="pill-button inline-flex justify-center text-base">Record</a>
+      <p class="text-xl font-semibold text-ink">No entries today</p>
+      <p class="text-sm text-muted">Start tracking your health</p>
+      <a routerLink="/patient/record" class="pill-button inline-flex justify-center text-base">+ Add First Entry</a>
     </div>
   </ng-template>
 </div>

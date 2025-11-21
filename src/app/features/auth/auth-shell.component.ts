@@ -23,14 +23,14 @@ export class AuthShellComponent {
   private readonly contextService = inject(ContextService);
   private readonly router = inject(Router);
 
-  readonly selectedRole = signal<UserRole | null>(null);
-  readonly mode = signal<'signin' | 'signup'>('signup');
+  readonly selectedRole = signal<UserRole>('patient');
+  readonly mode = signal<'signin' | 'signup'>('signin');
   readonly status = signal<'idle' | 'loading' | 'error' | 'success'>('idle');
   readonly errorMessage = signal<string | null>(null);
   readonly showAdvanced = signal(false);
 
   readonly onboardingForm: FormGroup = this.fb.group({
-    displayName: ['', [Validators.required, Validators.minLength(2)]],
+    displayName: [''],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     language: ['en' as LanguageCode, Validators.required],
@@ -40,16 +40,25 @@ export class AuthShellComponent {
       hypertension: [false],
       diabetes: [false]
     }),
-    facilityName: [''],
-    providerType: [''],
     shareCode: [{ value: '', disabled: true }]
   });
 
   constructor() {
     effect(() => {
-      if (this.selectedRole() === 'patient') {
+      const isPatientSignup = this.selectedRole() === 'patient' && this.mode() === 'signup';
+      if (isPatientSignup) {
         const shareCode = this.profileService.generateShareCode();
         this.onboardingForm.patchValue({ shareCode });
+      }
+
+      const displayNameControl = this.onboardingForm.get('displayName');
+      if (displayNameControl) {
+        if (this.mode() === 'signup') {
+          displayNameControl.setValidators([Validators.required, Validators.minLength(2)]);
+        } else {
+          displayNameControl.clearValidators();
+        }
+        displayNameControl.updateValueAndValidity({ emitEvent: false });
       }
     });
   }
@@ -63,11 +72,6 @@ export class AuthShellComponent {
   }
 
   async submit() {
-    if (!this.selectedRole()) {
-      this.errorMessage.set('Please select a role to continue');
-      return;
-    }
-
     if (this.mode() === 'signup' && this.onboardingForm.invalid) {
       this.onboardingForm.markAllAsTouched();
       return;
@@ -86,34 +90,30 @@ export class AuthShellComponent {
         await this.persistProfile(user.uid);
       }
 
-      this.contextService.setRole(this.selectedRole()!);
+      this.contextService.setRole(this.selectedRole());
       await this.router.navigate([this.selectedRole() === 'patient' ? '/patient' : '/provider']);
       this.status.set('success');
     } catch (error: any) {
       console.error(error);
       this.status.set('error');
-      this.errorMessage.set(error?.message ?? 'Unable to authenticate');
+      this.errorMessage.set(this.toHumanError(error));
     }
   }
 
   async continueWithGoogle() {
-    if (!this.selectedRole()) {
-      this.errorMessage.set('Select a role before using Google sign-in');
-      return;
-    }
     this.status.set('loading');
     try {
       const user = await firstValueFrom(this.authService.signInWithGoogle());
       if (this.mode() === 'signup') {
         await this.persistProfile(user.uid);
       }
-      this.contextService.setRole(this.selectedRole()!);
+      this.contextService.setRole(this.selectedRole());
       await this.router.navigate([this.selectedRole() === 'patient' ? '/patient' : '/provider']);
       this.status.set('success');
     } catch (error: any) {
       console.error(error);
       this.status.set('error');
-      this.errorMessage.set(error?.message ?? 'Unable to sign in with Google');
+      this.errorMessage.set(this.toHumanError(error));
     }
   }
 
@@ -141,8 +141,6 @@ export class AuthShellComponent {
         displayName: raw.displayName,
         lang: raw.language,
         phone: raw.phone ?? undefined,
-        facilityName: raw.facilityName ?? undefined,
-        providerType: raw.providerType ?? undefined,
         createdAt: timestamp,
         updatedAt: timestamp
       };
@@ -159,5 +157,21 @@ export class AuthShellComponent {
       result.push('diabetes');
     }
     return result;
+  }
+
+  private toHumanError(error: any): string {
+    const code = error?.code ?? '';
+    switch (code) {
+      case 'auth/invalid-credential':
+      case 'auth/wrong-password':
+      case 'auth/user-not-found':
+        return 'Email or password is incorrect. Please try again.';
+      case 'auth/email-already-in-use':
+        return 'This email is already registered. Try signing in instead.';
+      case 'auth/network-request-failed':
+        return 'Network error. Check your internet connection and try again.';
+      default:
+        return error?.message ?? 'Something went wrong. Please try again.';
+    }
   }
 }

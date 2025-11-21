@@ -1,25 +1,55 @@
-<section class="flex flex-col min-h-full bg-background">
-  <div class="px-4 pt-4" *ngIf="viewingPatientId(); else idleState">
-    <div class="flex items-center justify-between rounded-2xl bg-brand/10 text-brand-dark px-4 py-2 text-sm">
-      <span>Viewing {{ viewingPatientId() }}</span>
-      <button class="text-brand font-semibold" (click)="exitViewAs()">Exit</button>
+<section class="min-h-screen bg-background flex flex-col">
+  <!-- Clean Header -->
+  <header class="bg-surface shadow-sm border-b border-border/40 px-4 md:px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div class="flex-1 min-w-0">
+        <h1 class="text-xl md:text-2xl font-bold text-ink truncate">Provider Dashboard</h1>
+        <p class="text-sm text-muted mt-0.5">Manage your patients</p>
+      </div>
+      <button type="button"
+              class="w-11 h-11 flex-shrink-0 rounded-full bg-brand-gradient text-white font-bold shadow-lg hover:shadow-xl transition-shadow"
+              aria-label="Profile"
+              (click)="goToProfile()">
+        {{ userInitial() }}
+      </button>
+    </div>
+  </header>
+
+  
+
+  <!-- Main Content Area -->
+  <div class="flex-1 overflow-hidden">
+    <div class="max-w-7xl mx-auto h-full px-4 md:px-6 py-4 md:py-6">
+      <div class="h-full flex flex-col lg:flex-row gap-4 md:gap-6">
+        
+        <!-- Patient List Panel (Left Side on Desktop / Full width on Mobile when no patient) -->
+        <aside *ngIf="showListPanel()" 
+               class="w-full lg:w-80 xl:w-96 flex-shrink-0">
+          <div class="bg-surface rounded-2xl shadow-lg border border-border/20 h-full overflow-hidden flex flex-col">
+            <div class="p-4 md:p-6 border-b border-border/40">
+              <h2 class="text-lg font-bold text-ink">Search Patients</h2>
+              <p class="text-xs text-muted mt-1">Find by name or share code</p>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+              <app-provider-patients />
+            </div>
+          </div>
+        </aside>
+
+        <!-- Patient Detail Panel (Full width when patient selected) -->
+        <main *ngIf="showDetailPanel()" 
+              class="flex-1 min-w-0">
+          <!-- Back Button - Show when patient is selected -->
+          <button *ngIf="hasActivePatient()" 
+                  class="mb-4 flex items-center gap-2 px-4 py-2 bg-surface rounded-xl shadow-md text-brand font-semibold hover:shadow-lg transition-shadow"
+                  (click)="backToList()">
+            <span class="text-2xl">←</span>
+            <span>Back to List</span>
+          </button>
+          <router-outlet />
+        </main>
+
+      </div>
     </div>
   </div>
-  <ng-template #idleState>
-    <div class="px-4 pt-4 text-xs uppercase tracking-[0.4em] text-muted">Pick a patient</div>
-  </ng-template>
-
-  <div class="flex-1 overflow-y-auto">
-    <router-outlet />
-  </div>
-
-  <nav class="sticky bottom-0 w-full bg-surface border-t border-border/80 shadow-brand-soft px-4 py-2 flex justify-between text-xs uppercase tracking-[0.3em]">
-    <a *ngFor="let item of navItems"
-       [routerLink]="item.path"
-       routerLinkActive="text-brand font-semibold"
-       class="flex-1 text-center text-muted">
-      <span class="block text-lg">{{ item.icon }}</span>
-      {{ item.label }}
-    </a>
-  </nav>
 </section>

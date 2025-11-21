@@ -40,7 +40,9 @@
       "enabled": true,
       "port": 4000
     },
-    "singleProjectMode": true
+    "singleProjectMode": true,
+    "import": ".firebase/emulator-data",
+    "exportOnExit": ".firebase/emulator-data"
   }
 }
 

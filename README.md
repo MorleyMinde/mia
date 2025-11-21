@@ -12,6 +12,23 @@ ng serve
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
+## Firebase emulators with persisted data
+
+Run both Angular dev server and the Firebase emulators (Auth, Firestore, Functions, Hosting, UI) with:
+
+```bash
+npm run dev
+```
+
+The `firebase.json` configuration together with the updated npm scripts ensures emulator state is exported to `.firebase/emulator-data` when you stop the emulators and is automatically re-imported the next time you start them. This means Firestore documents, Auth users, and other emulator data will survive restarts.
+
+- `npm run emulators` – start emulators only with automatic save/restore.
+- `npm run emulators:export` – manually snapshot current emulator data.
+- `npm run emulators:import` – import a snapshot without running the Angular dev server.
+- `npm run emulators:clean` – delete the saved emulator data to start fresh.
+
+To inspect or manage the emulators visually, open the Emulator UI at `http://localhost:4000`.
+
 ## Code scaffolding
 
 Angular CLI includes powerful code scaffolding tools. To generate a new component, run:

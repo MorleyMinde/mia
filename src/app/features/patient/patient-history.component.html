@@ -1,18 +1,115 @@
 <section class="space-y-3 p-4">
   <div class="flex items-center justify-between">
     <h2 class="text-xl font-semibold text-ink">History</h2>
-    <span class="text-xs text-muted">{{ entries().length }} days</span>
+    <span class="text-xs text-muted">{{ entries().length }} entries</span>
   </div>
 
-  <div *ngIf="entries().length; else empty" class="space-y-2">
-    <article *ngFor="let entry of entries()" class="rounded-2xl bg-surface shadow-brand-soft px-4 py-3 flex items-center justify-between">
-      <div>
-        <p class="text-lg font-semibold text-ink">{{ entry.date | date:'EEE d MMM' }}</p>
-        <p class="text-xs text-muted">BP {{ entry.bp?.sys || '--' }}/{{ entry.bp?.dia || '--' }}</p>
+  <div *ngIf="groupedEntries().length; else empty" class="space-y-2">
+    <!-- Day Group -->
+    <article *ngFor="let dayGroup of groupedEntries()" class="rounded-2xl bg-surface shadow-brand-soft overflow-hidden">
+      <!-- Day Header (Clickable) -->
+      <div 
+        class="px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-surface-muted/30 transition-colors"
+        (click)="toggleDay(dayGroup.dateString)">
+        <div>
+          <p class="text-lg font-semibold text-ink">{{ dayGroup.date | date:'EEE, d MMM yyyy' }}</p>
+          <p class="text-xs text-muted">{{ dayGroup.entries.length }} {{ dayGroup.entries.length === 1 ? 'entry' : 'entries' }}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="statusBadge(dayGroup.worstStatus)">
+            {{ dayGroup.worstStatus | titlecase }}
+          </span>
+          <svg 
+            class="w-5 h-5 transition-transform" 
+            [class.rotate-180]="isDayExpanded(dayGroup.dateString)" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
       </div>
-      <span class="px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="statusBadge(entry.status)">
-        {{ entry.status | titlecase }}
-      </span>
+
+      <!-- Entries List (Expandable) -->
+      <div *ngIf="isDayExpanded(dayGroup.dateString)" class="px-4 pb-3 pt-0 space-y-2 border-t border-border/30">
+        <div 
+          *ngFor="let entry of dayGroup.entries" 
+          class="rounded-xl bg-surface-muted/30 p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-semibold text-ink">{{ formatTime(entry.timestamp) }}</span>
+            <span class="px-2 py-1 rounded-full text-xs font-semibold" [ngClass]="statusBadge(entry.status)">
+              {{ entry.status }}
+            </span>
+          </div>
+          
+          <!-- Entry Details Grid -->
+          <div class="grid grid-cols-3 gap-3 text-xs">
+            <div *ngIf="entry.bp" class="flex flex-col">
+              <span class="text-muted text-[10px] uppercase tracking-wider">Blood Pressure</span>
+              <span class="font-semibold text-ink">{{ entry.bp.sys }}/{{ entry.bp.dia }} <span class="text-muted">mmHg</span></span>
+            </div>
+            <div *ngIf="entry.glucose" class="flex flex-col">
+              <span class="text-muted text-[10px] uppercase tracking-wider">Glucose</span>
+              <span class="font-semibold text-ink">{{ entry.glucose.mmol }} <span class="text-muted">mmol/L</span></span>
+              <span class="text-muted text-[9px]">{{ entry.glucose.context }}</span>
+            </div>
+            <div *ngIf="entry.meds" class="flex flex-col">
+              <span class="text-muted text-[10px] uppercase tracking-wider">Medications</span>
+              <span class="font-semibold text-ink">{{ entry.meds.taken ? 'Taken ✓' : 'Not taken ✗' }}</span>
+            </div>
+            <div *ngIf="entry.exercise" class="flex flex-col">
+              <span class="text-muted text-[10px] uppercase tracking-wider">Exercise</span>
+              <span class="font-semibold text-ink">{{ entry.exercise.minutes }} min</span>
+            </div>
+            <div *ngIf="entry.food" class="flex flex-col">
+              <span class="text-muted text-[10px] uppercase tracking-wider">Diet</span>
+              <span class="font-semibold text-ink">Salt {{ entry.food.salt }}/5, Carb {{ entry.food.carb }}/5</span>
+            </div>
+            <div *ngIf="entry.alcohol && entry.alcohol > 0" class="flex flex-col">
+              <span class="text-muted text-[10px] uppercase tracking-wider">Alcohol</span>
+              <span class="font-semibold text-ink">{{ entry.alcohol }} units</span>
+            </div>
+            <div *ngIf="entry.cigarettes && entry.cigarettes > 0" class="flex flex-col">
+              <span class="text-muted text-[10px] uppercase tracking-wider">Cigarettes</span>
+              <span class="font-semibold text-ink">{{ entry.cigarettes }}</span>
+            </div>
+            <div *ngIf="entry.herbs?.length" class="flex flex-col col-span-2">
+              <span class="text-muted text-[10px] uppercase tracking-wider">Herbs</span>
+              <span class="font-semibold text-ink">{{ entry.herbs?.join(', ') }}</span>
+            </div>
+          </div>
+
+          <!-- Status Reasons -->
+          <div *ngIf="entry.statusReasons?.length" class="pt-2 border-t border-border/20">
+            <p class="text-[10px] text-muted uppercase tracking-wider mb-1">Alerts</p>
+            <div class="flex flex-wrap gap-1">
+              <span 
+                *ngFor="let reason of entry.statusReasons" 
+                class="text-xs px-2 py-1 rounded-full bg-yellow-50 text-yellow-900">
+                {{ reason }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div *ngIf="entry.actions?.length" class="pt-2 border-t border-border/20">
+            <p class="text-[10px] text-muted uppercase tracking-wider mb-1">Recommendations</p>
+            <div class="flex flex-wrap gap-1">
+              <span 
+                *ngFor="let action of entry.actions" 
+                class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-900">
+                {{ action }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div *ngIf="entry.notes" class="pt-2 border-t border-border/20">
+            <p class="text-[10px] text-muted uppercase tracking-wider mb-1">Notes</p>
+            <p class="text-xs text-ink">{{ entry.notes }}</p>
+          </div>
+        </div>
+      </div>
     </article>
   </div>
 

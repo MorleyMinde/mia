@@ -1,19 +1,6 @@
 <div class="min-h-screen bg-background px-4 py-5">
-  <main class="max-w-md mx-auto min-h-screen flex flex-col gap-4">
-    <header class="flex items-center justify-between rounded-2xl bg-surface px-4 py-3 shadow-brand-soft">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-2xl bg-brand-gradient text-white font-bold text-xl flex items-center justify-center">M</div>
-        <div>
-          <p class="text-[10px] uppercase tracking-[0.4em] text-muted">Mtu ni Afya</p>
-          <h1 class="text-xl font-semibold text-ink">Care companion</h1>
-        </div>
-      </div>
-      <a routerLink="/auth" class="pill-button text-xs px-4 py-2 uppercase">Start</a>
-    </header>
-
-    <section class="flex-1 rounded-3xl bg-surface shadow-brand-soft overflow-hidden">
-      <router-outlet />
-    </section>
+  <main class="max-w-md mx-auto rounded-3xl bg-surface shadow-brand-soft min-h-[80vh] overflow-hidden">
+    <router-outlet />
   </main>
-</div>
+  </div>
 

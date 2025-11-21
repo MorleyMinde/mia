@@ -4,44 +4,41 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
 import { ProfileService } from '../../core/services/profile.service';
-import { PatientProfile } from '../../core/models/user-profile.model';
+import { ProviderProfile } from '../../core/models/user-profile.model';
 
 @Component({
-  selector: 'app-patient-profile',
+  selector: 'app-provider-profile',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './patient-profile.component.html',
-  styleUrls: ['./patient-profile.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  templateUrl: './provider-profile.component.html',
+  styleUrls: ['./provider-profile.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PatientProfileComponent {
+export class ProviderProfileComponent {
   private readonly profileService = inject(ProfileService);
-  private readonly context = inject(ContextService);
   private readonly authService = inject(AuthService);
+  private readonly context = inject(ContextService);
   private readonly router = inject(Router);
 
-  readonly profile = signal<PatientProfile | null>(null);
-  readonly activePatientId = computed(() => this.context.context().actingAsPatientId ?? this.authService.user()?.uid ?? null);
-  readonly canLogout = computed(() => this.context.currentRole() === 'patient');
+  readonly profile = signal<ProviderProfile | null>(null);
+  readonly displayEmail = computed(() => this.authService.user()?.email ?? '');
 
   constructor() {
     effect((onCleanup) => {
-      const uid = this.activePatientId();
+      const uid = this.authService.user()?.uid;
       if (!uid) {
         this.profile.set(null);
         return;
       }
-      const sub = this.profileService.listenToProfile(uid).subscribe((profile) => this.profile.set(profile as PatientProfile));
+      const sub = this.profileService.listenToProfile(uid).subscribe((profile) => this.profile.set(profile as ProviderProfile));
       onCleanup(() => sub.unsubscribe());
     });
   }
 
   async logout() {
-    if (!this.canLogout()) {
-      return;
-    }
     await this.authService.signOut();
     this.context.setRole('patient');
+    this.context.exitViewAs();
     await this.router.navigate(['/auth']);
   }
 }
