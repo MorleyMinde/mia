@@ -33,7 +33,17 @@ export class PatientInsightsComponent {
         this.entries.set([]);
         return;
       }
-      const sub = this.entryService.listenToEntries(patientId).subscribe((entries) => this.entries.set(entries));
+      console.log('[PatientInsights] Listening to entries for patient:', patientId);
+      const sub = this.entryService.listenToEntries(patientId).subscribe({
+        next: (entries) => {
+          console.log('[PatientInsights] Received entries:', entries.length);
+          this.entries.set(entries);
+        },
+        error: (error) => {
+          console.error('[PatientInsights] Error fetching entries:', error);
+          this.entries.set([]);
+        }
+      });
       onCleanup(() => sub.unsubscribe());
     });
   }
@@ -44,13 +54,30 @@ export class PatientInsightsComponent {
     // Group entries by date
     const dateMap = new Map<string, HealthEntry[]>();
     entries.forEach(entry => {
-      const date = new Date(entry.timestamp);
-      date.setHours(0, 0, 0, 0);
-      const dateStr = date.toISOString().split('T')[0];
-      if (!dateMap.has(dateStr)) {
-        dateMap.set(dateStr, []);
+      if (!entry.timestamp) return;
+      
+      try {
+        let timestamp: Date;
+        if (entry.timestamp instanceof Date) {
+          timestamp = entry.timestamp;
+        } else if (typeof entry.timestamp === 'object' && 'toDate' in entry.timestamp) {
+          timestamp = (entry.timestamp as any).toDate();
+        } else {
+          timestamp = new Date(entry.timestamp);
+        }
+        
+        if (isNaN(timestamp.getTime())) return;
+        
+        const date = new Date(timestamp);
+        date.setHours(0, 0, 0, 0);
+        const dateStr = date.toISOString().split('T')[0];
+        if (!dateMap.has(dateStr)) {
+          dateMap.set(dateStr, []);
+        }
+        dateMap.get(dateStr)!.push(entry);
+      } catch (error) {
+        console.warn('[PatientInsights] Error processing entry timestamp:', error);
       }
-      dateMap.get(dateStr)!.push(entry);
     });
     
     // Count consecutive days with entries

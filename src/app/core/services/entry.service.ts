@@ -28,16 +28,29 @@ export class EntryService {
    * Listen to all entries for a user, ordered by timestamp descending
    */
   listenToEntries(uid: string): Observable<HealthEntry[]> {
+    console.log('[EntryService] Setting up listener for uid:', uid);
     const q = query(this.collection(uid), orderBy('timestamp', 'desc'));
     return collectionData(q, { idField: 'id' }).pipe(
-      map((entries) => 
-        entries.map(entry => ({
+      map((entries) => {
+        console.log('[EntryService] Raw entries from Firestore:', entries.length);
+        if (entries.length > 0) {
+          console.log('[EntryService] Raw first entry:', entries[0]);
+        }
+        
+        const converted = entries.map(entry => ({
           ...entry,
           timestamp: this.toDate(entry.timestamp),
           createdAt: this.toDate(entry.createdAt),
           updatedAt: this.toDate(entry.updatedAt)
-        }))
-      )
+        }));
+        
+        console.log('[EntryService] Converted entries:', converted.length);
+        if (converted.length > 0) {
+          console.log('[EntryService] Converted first entry:', converted[0]);
+        }
+        
+        return converted;
+      })
     ) as Observable<HealthEntry[]>;
   }
 
@@ -108,13 +121,35 @@ export class EntryService {
    * Convert Firestore Timestamp to Date
    */
   private toDate(value: any): Date {
+    if (!value) {
+      console.warn('[EntryService] toDate called with null/undefined value');
+      return new Date();
+    }
+    
     if (value instanceof Date) {
       return value;
     }
-    if (value?.toDate) {
-      return value.toDate();
+    
+    if (typeof value === 'object' && value.toDate && typeof value.toDate === 'function') {
+      try {
+        return value.toDate();
+      } catch (error) {
+        console.error('[EntryService] Error calling toDate():', error);
+        return new Date(value.seconds * 1000); // Fallback for Firestore Timestamp
+      }
     }
-    return new Date(value);
+    
+    try {
+      const date = new Date(value);
+      if (isNaN(date.getTime())) {
+        console.warn('[EntryService] Invalid date value:', value);
+        return new Date();
+      }
+      return date;
+    } catch (error) {
+      console.error('[EntryService] Error parsing date:', error, value);
+      return new Date();
+    }
   }
 
   private removeUndefined<T>(value: T): T {

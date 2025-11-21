@@ -88,7 +88,20 @@ export class PatientHistoryComponent {
         this.entries.set([]);
         return;
       }
-      const sub = this.entryService.listenToEntries(patientId).subscribe((entries) => this.entries.set(entries));
+      console.log('[PatientHistory] Listening to entries for patient:', patientId);
+      const sub = this.entryService.listenToEntries(patientId).subscribe({
+        next: (entries) => {
+          console.log('[PatientHistory] Received entries:', entries.length);
+          if (entries.length > 0) {
+            console.log('[PatientHistory] Sample entry:', entries[0]);
+          }
+          this.entries.set(entries);
+        },
+        error: (error) => {
+          console.error('[PatientHistory] Error fetching entries:', error);
+          this.entries.set([]);
+        }
+      });
       onCleanup(() => sub.unsubscribe());
     });
   }
@@ -119,7 +132,25 @@ export class PatientHistoryComponent {
     }
   }
 
-  formatTime(timestamp: Date): string {
-    return new Date(timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  formatTime(timestamp: Date | any): string {
+    try {
+      let date: Date;
+      if (timestamp instanceof Date) {
+        date = timestamp;
+      } else if (typeof timestamp === 'object' && 'toDate' in timestamp) {
+        date = (timestamp as any).toDate();
+      } else {
+        date = new Date(timestamp);
+      }
+      
+      if (isNaN(date.getTime())) {
+        return '';
+      }
+      
+      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    } catch (error) {
+      console.error('[PatientHistory] Error formatting time:', error);
+      return '';
+    }
   }
 }

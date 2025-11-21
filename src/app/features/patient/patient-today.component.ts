@@ -34,7 +34,27 @@ export class PatientTodayComponent {
     tomorrow.setDate(tomorrow.getDate() + 1);
     
     return entries.filter(entry => {
-      const entryDate = new Date(entry.timestamp);
+      if (!entry.timestamp) {
+        console.warn('[PatientToday] Entry missing timestamp:', entry);
+        return false;
+      }
+      
+      // Convert timestamp to Date if needed
+      let entryDate: Date;
+      if (entry.timestamp instanceof Date) {
+        entryDate = entry.timestamp;
+      } else if (typeof entry.timestamp === 'object' && 'toDate' in entry.timestamp) {
+        entryDate = (entry.timestamp as any).toDate();
+      } else {
+        entryDate = new Date(entry.timestamp);
+      }
+      
+      // Validate timestamp
+      if (isNaN(entryDate.getTime())) {
+        console.warn('[PatientToday] Invalid timestamp:', entry.timestamp);
+        return false;
+      }
+      
       return entryDate >= today && entryDate < tomorrow;
     });
   });
@@ -62,13 +82,18 @@ export class PatientTodayComponent {
         return;
       }
       this.loading.set(true);
+      console.log('[PatientToday] Listening to entries for patient:', patientId);
       const subscription = this.entryService.listenToEntries(patientId).subscribe({
         next: (entries) => {
+          console.log('[PatientToday] Received entries:', entries.length);
+          if (entries.length > 0) {
+            console.log('[PatientToday] First entry:', entries[0]);
+          }
           this.allEntries.set(entries);
           this.loading.set(false);
         },
         error: (error) => {
-          console.error(error);
+          console.error('[PatientToday] Error fetching entries:', error);
           this.loading.set(false);
         }
       });
@@ -82,6 +107,25 @@ export class PatientTodayComponent {
 
   formatTime(timestamp: Date | undefined): string {
     if (!timestamp) return '';
-    return new Date(timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    
+    try {
+      let date: Date;
+      if (timestamp instanceof Date) {
+        date = timestamp;
+      } else if (typeof timestamp === 'object' && 'toDate' in timestamp) {
+        date = (timestamp as any).toDate();
+      } else {
+        date = new Date(timestamp);
+      }
+      
+      if (isNaN(date.getTime())) {
+        return '';
+      }
+      
+      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    } catch (error) {
+      console.error('[PatientToday] Error formatting time:', error);
+      return '';
+    }
   }
 }
