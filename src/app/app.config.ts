@@ -1,12 +1,30 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
 import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
 import { provideFunctions, getFunctions, connectFunctionsEmulator } from '@angular/fire/functions';
+import { provideHttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 
 import { routes } from './app.routes';
+
+// Custom TranslateLoader implementation
+export class CustomTranslateLoader implements TranslateLoader {
+  constructor(private http: HttpClient) {}
+  
+  getTranslation(lang: string): Observable<any> {
+    return this.http.get(`./assets/i18n/${lang}.json`);
+  }
+}
+
+// Factory function for TranslateLoader
+export function HttpLoaderFactory(http: HttpClient): TranslateLoader {
+  return new CustomTranslateLoader(http);
+}
 
 // Track which emulators have been connected to avoid multiple connections
 const connectedEmulators = {
@@ -20,6 +38,17 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
+    provideHttpClient(),
+    importProvidersFrom(
+      TranslateModule.forRoot({
+        defaultLanguage: 'en',
+        loader: {
+          provide: TranslateLoader,
+          useFactory: HttpLoaderFactory,
+          deps: [HttpClient]
+        }
+      })
+    ),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => {
       const firestore = getFirestore();

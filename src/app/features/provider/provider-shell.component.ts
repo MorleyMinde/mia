@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, HostListener, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
 import { ProviderPatientsComponent } from './provider-patients.component';
+import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-provider-shell',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterOutlet, ProviderPatientsComponent],
+  imports: [CommonModule, RouterLink, RouterOutlet, ProviderPatientsComponent, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './provider-shell.component.html',
   styleUrls: ['./provider-shell.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

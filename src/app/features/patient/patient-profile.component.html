@@ -5,24 +5,24 @@
     </div>
     <div>
       <h2 class="text-xl font-semibold text-ink">{{ profile()?.displayName }}</h2>
-      <p class="text-xs text-muted uppercase tracking-[0.4em]">Code {{ profile()?.shareCode || '••••' }}</p>
+      <p class="text-xs text-muted uppercase tracking-[0.4em]">{{ 'common.code' | translate }} {{ profile()?.shareCode || '••••' }}</p>
     </div>
   </div>
   <div class="grid grid-cols-2 gap-2">
     <div class="stat-card">
-      <p>Birth</p>
+      <p>{{ 'patient.birth' | translate }}</p>
       <h3>{{ profile()?.yearOfBirth || '—' }}</h3>
     </div>
     <div class="stat-card">
-      <p>Conditions</p>
+      <p>{{ 'auth.conditions' | translate }}</p>
       <h3>{{ profile()?.conditions?.length || 0 }}</h3>
     </div>
   </div>
-  <button *ngIf="canLogout()" type="button" class="pill-button w-full text-lg" (click)="logout()">Log out</button>
+  <button *ngIf="canLogout()" type="button" class="pill-button w-full text-lg" (click)="logout()">{{ 'auth.logout' | translate }}</button>
 </section>
 
 <ng-template #empty>
   <div class="rounded-2xl border border-dashed border-border/70 p-6 text-center text-muted">
-    No profile data yet.
+    {{ 'patient.noProfileData' | translate }}
   </div>
 </ng-template>

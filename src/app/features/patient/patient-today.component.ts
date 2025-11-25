@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { HealthEntry } from '../../core/models/daily-entry.model';
 import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
@@ -9,7 +10,7 @@ import { EntryService } from '../../core/services/entry.service';
 @Component({
   selector: 'app-patient-today',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   templateUrl: './patient-today.component.html',
   styleUrls: ['./patient-today.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

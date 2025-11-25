@@ -3,15 +3,18 @@
   <header class="bg-surface shadow-sm border-b border-border/40 px-4 md:px-6 py-4">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
       <div class="flex-1 min-w-0">
-        <h1 class="text-xl md:text-2xl font-bold text-ink truncate">Provider Dashboard</h1>
-        <p class="text-sm text-muted mt-0.5">Manage your patients</p>
+        <h1 class="text-xl md:text-2xl font-bold text-ink truncate">{{ 'provider.dashboard' | translate }}</h1>
+        <p class="text-sm text-muted mt-0.5">{{ 'provider.managePatients' | translate }}</p>
       </div>
-      <button type="button"
-              class="w-11 h-11 flex-shrink-0 rounded-full bg-brand-gradient text-white font-bold shadow-lg hover:shadow-xl transition-shadow"
-              aria-label="Profile"
-              (click)="goToProfile()">
-        {{ userInitial() }}
-      </button>
+      <div class="flex items-center gap-2">
+        <app-language-switcher />
+        <button type="button"
+                class="w-11 h-11 flex-shrink-0 rounded-full bg-brand-gradient text-white font-bold shadow-lg hover:shadow-xl transition-shadow"
+                [attr.aria-label]="'auth.profile' | translate"
+                (click)="goToProfile()">
+          {{ userInitial() }}
+        </button>
+      </div>
     </div>
   </header>
 
@@ -27,8 +30,8 @@
                class="w-full lg:w-80 xl:w-96 flex-shrink-0">
           <div class="bg-surface rounded-2xl shadow-lg border border-border/20 h-full overflow-hidden flex flex-col">
             <div class="p-4 md:p-6 border-b border-border/40">
-              <h2 class="text-lg font-bold text-ink">Search Patients</h2>
-              <p class="text-xs text-muted mt-1">Find by name or share code</p>
+              <h2 class="text-lg font-bold text-ink">{{ 'provider.searchPatients' | translate }}</h2>
+              <p class="text-xs text-muted mt-1">{{ 'provider.findByNameOrCode' | translate }}</p>
             </div>
             <div class="flex-1 overflow-y-auto">
               <app-provider-patients />
@@ -44,7 +47,7 @@
                   class="mb-4 flex items-center gap-2 px-4 py-2 bg-surface rounded-xl shadow-md text-brand font-semibold hover:shadow-lg transition-shadow"
                   (click)="backToList()">
             <span class="text-2xl">←</span>
-            <span>Back to List</span>
+            <span>{{ 'provider.backToList' | translate }}</span>
           </button>
           <router-outlet />
         </main>

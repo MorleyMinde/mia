@@ -1,7 +1,10 @@
 <section class="p-4 sm:p-6 space-y-5">
-  <div class="text-center space-y-1">
-    <h2 class="text-2xl font-semibold text-ink">Sign {{ mode() === 'signup' ? 'up' : 'in' }}</h2>
+  <div class="flex items-center justify-between">
+    <div class="text-center flex-1 space-y-1">
+      <h2 class="text-2xl font-semibold text-ink">{{ (mode() === 'signup' ? 'auth.signUp' : 'auth.signIn') | translate }}</h2>
     </div>
+    <app-language-switcher />
+  </div>
 
   <div class="rounded-full bg-surface-muted/60 p-1 flex">
     <button type="button"
@@ -9,20 +12,20 @@
             [class.bg-surface]="selectedRole() === 'patient'"
             [class.text-ink]="selectedRole() === 'patient'"
             (click)="selectRole('patient')">
-      Patient
+      {{ 'auth.patient' | translate }}
     </button>
     <button type="button"
             class="flex-1 rounded-full py-2 text-sm font-semibold transition"
             [class.bg-surface]="selectedRole() === 'provider'"
             [class.text-ink]="selectedRole() === 'provider'"
             (click)="selectRole('provider')">
-      Provider
+      {{ 'auth.provider' | translate }}
     </button>
   </div>
 
   <div class="flex justify-center">
     <button class="text-xs text-brand font-semibold underline" (click)="toggleMode()">
-      {{ mode() === 'signup' ? 'Have an account? Sign in' : 'New here? Create account' }}
+      {{ (mode() === 'signup' ? 'auth.signInPrompt' : 'auth.signUpPrompt') | translate }}
     </button>
   </div>
 
@@ -31,43 +34,43 @@
       {{ errorMessage() }}
     </div>
     <label class="field" *ngIf="mode() === 'signup'">
-      <span>Display name</span>
+      <span>{{ 'auth.displayName' | translate }}</span>
       <input formControlName="displayName" type="text" class="input" placeholder="Mama Asha" autocomplete="name">
     </label>
 
     <label class="field">
-      <span>Email</span>
+      <span>{{ 'auth.email' | translate }}</span>
       <input formControlName="email" type="email" class="input" placeholder="you@email.com" autocomplete="email">
     </label>
 
     <label class="field">
-      <span>Password</span>
+      <span>{{ 'auth.password' | translate }}</span>
       <input formControlName="password" type="password" class="input" [attr.autocomplete]="mode() === 'signup' ? 'new-password' : 'current-password'">
       </label>
 
     <div class="grid grid-cols-2 gap-3">
       <label class="field">
-        <span>Language</span>
+        <span>{{ 'auth.language' | translate }}</span>
         <select formControlName="language" class="input">
-          <option value="en">English</option>
-          <option value="sw">Swahili</option>
+          <option value="en">{{ 'languages.en' | translate }}</option>
+          <option value="sw">{{ 'languages.sw' | translate }}</option>
         </select>
       </label>
       <label class="field" *ngIf="mode() === 'signup'">
-        <span>Phone</span>
+        <span>{{ 'auth.phone' | translate }}</span>
         <input formControlName="phone" type="tel" class="input" placeholder="+255...">
       </label>
     </div>
 
     <label class="field" *ngIf="selectedRole() === 'patient' && mode() === 'signup'">
-      <span>Year of birth</span>
+      <span>{{ 'auth.yearOfBirth' | translate }}</span>
         <input formControlName="yearOfBirth" type="number" min="1930" max="2020" class="input">
       </label>
 
     <div class="rounded-2xl border border-border/70 p-3 space-y-2 text-sm" *ngIf="selectedRole() === 'patient' && mode() === 'signup'" formGroupName="conditions">
       <div class="flex items-center justify-between text-xs uppercase tracking-wide">
-        <span class="text-muted">Conditions</span>
-        <span class="text-brand font-semibold">Code: {{ onboardingForm.get('shareCode')?.value || '••••••' }}</span>
+        <span class="text-muted">{{ 'auth.conditions' | translate }}</span>
+        <span class="text-brand font-semibold">{{ 'common.code' | translate }}: {{ onboardingForm.get('shareCode')?.value || '••••••' }}</span>
       </div>
       <div class="flex gap-4">
         <label class="chip">
@@ -83,10 +86,10 @@
 
     <div class="space-y-2 pt-2">
       <button type="submit" class="pill-button w-full text-lg">
-        {{ mode() === 'signup' ? 'Create account' : 'Continue' }}
+        {{ (mode() === 'signup' ? 'auth.createAccount' : 'common.continue') | translate }}
       </button>
       <button type="button" class="pill-button pill-button--accent w-full text-lg" (click)="continueWithGoogle()">
-        Continue with Google
+        {{ 'auth.continueWithGoogle' | translate }}
       </button>
     </div>
   </form>

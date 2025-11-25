@@ -1,16 +1,19 @@
 <section class="flex flex-col min-h-full bg-background">
   <header class="px-4 pt-4 space-y-3">
     <div class="flex items-center justify-between">
-      <div>
-        <p class="text-[10px] uppercase tracking-[0.5em] text-muted">Patient</p>
-        <h1 class="text-xl font-semibold text-ink">Mtu ni Afya (MiA)</h1>
+      <div class="flex-1">
+        <p class="text-[10px] uppercase tracking-[0.5em] text-muted">{{ 'auth.patient' | translate }}</p>
+        <h1 class="text-xl font-semibold text-ink">{{ 'app.title' | translate }}</h1>
       </div>
-      <button type="button"
-              class="w-10 h-10 rounded-full bg-brand-gradient text-white font-semibold shadow-brand-soft"
-              aria-label="Profile"
-              (click)="goToProfile()">
-        {{ userInitial() }}
-      </button>
+      <div class="flex items-center gap-2">
+        <app-language-switcher />
+        <button type="button"
+                class="w-10 h-10 rounded-full bg-brand-gradient text-white font-semibold shadow-brand-soft"
+                [attr.aria-label]="'auth.profile' | translate"
+                (click)="goToProfile()">
+          {{ userInitial() }}
+        </button>
+      </div>
     </div>
     <nav class="nav-bar">
       <a *ngFor="let item of navItems"
@@ -18,7 +21,7 @@
          routerLinkActive="active"
          class="nav-link">
         <span class="text-lg">{{ item.icon }}</span>
-        {{ item.label }}
+        {{ item.label | translate }}
       </a>
     </nav>
   </header>

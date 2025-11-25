@@ -1,7 +1,7 @@
 <section class="space-y-4 p-4">
   <div class="space-y-2">
-    <h2 class="text-xl font-semibold text-ink">Search Patients</h2>
-    <p class="text-sm text-muted">Type a patient's name to search and select them.</p>
+    <h2 class="text-xl font-semibold text-ink">{{ 'provider.searchPatients' | translate }}</h2>
+    <p class="text-sm text-muted">{{ 'provider.searchByName' | translate }}</p>
   </div>
 
   <div class="space-y-3">
@@ -10,7 +10,7 @@
         type="text" 
         [formControl]="searchControl" 
         class="input pl-10" 
-        placeholder="Search by patient name..."
+        [placeholder]="'provider.searchByName' | translate"
         autocomplete="off">
       <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xl">🔍</span>
     </div>
@@ -18,14 +18,14 @@
     <p class="text-xs text-danger" *ngIf="errorMessage()">{{ errorMessage() }}</p>
     
     <p class="text-xs text-muted text-center" *ngIf="searching()">
-      Searching...
+      {{ 'common.searching' | translate }}
     </p>
   </div>
 
   <!-- Search Results / Linked Patients -->
   <div class="space-y-2" *ngIf="displayedPatients().length; else emptyState">
     <p class="text-xs text-muted uppercase tracking-wide px-2" *ngIf="searchControl.value && searchControl.value.length >= 2">
-      Search Results
+      {{ 'provider.searchResults' | translate }}
     </p>
     
     <article 
@@ -39,7 +39,7 @@
         <div class="min-w-0 flex-1">
           <p class="text-lg font-semibold text-ink truncate">{{ patient.displayName }}</p>
           <p class="text-xs text-muted">
-            <span *ngIf="patient.yearOfBirth">Age {{ getAge(patient.yearOfBirth) }}</span>
+            <span *ngIf="patient.yearOfBirth">{{ 'common.age' | translate }} {{ getAge(patient.yearOfBirth) }}</span>
             <span *ngIf="patient.yearOfBirth && patient.conditions?.length"> · </span>
             <span *ngIf="patient.conditions?.length">{{ patient.conditions.join(', ') }}</span>
           </p>
@@ -49,7 +49,7 @@
         type="button" 
         class="pill-button text-sm px-4 py-2 flex-shrink-0" 
         (click)="selectPatient(patient); $event.stopPropagation()">
-        Select
+        {{ 'common.select' | translate }}
       </button>
     </article>
   </div>
@@ -57,14 +57,14 @@
   <ng-template #emptyState>
     <div class="rounded-2xl border border-dashed border-border/70 p-8 text-center text-muted space-y-2 mt-8">
       <span class="text-4xl block">👥</span>
-      <p class="font-semibold" *ngIf="!searchControl.value">Start typing to search</p>
+      <p class="font-semibold" *ngIf="!searchControl.value">{{ 'provider.startTyping' | translate }}</p>
       <p class="font-semibold" *ngIf="searchControl.value && searchControl.value.length < 2">
-        Type at least 2 characters
+        {{ 'provider.typeAtLeast2' | translate }}
       </p>
       <p class="font-semibold" *ngIf="searchControl.value && searchControl.value.length >= 2 && !searching()">
-        No patients found
+        {{ 'provider.noPatientsFound' | translate }}
       </p>
-      <p class="text-sm">Search for patients by their name</p>
+      <p class="text-sm">{{ 'provider.searchByNamePrompt' | translate }}</p>
     </div>
   </ng-template>
 </section>

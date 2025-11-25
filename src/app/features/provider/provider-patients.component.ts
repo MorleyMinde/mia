@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, injec
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { debounceTime, switchMap, of } from 'rxjs';
 import { PatientProfile } from '../../core/models/user-profile.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -12,7 +13,7 @@ import { ProviderService } from '../../core/services/provider.service';
 @Component({
   selector: 'app-provider-patients',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './provider-patients.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

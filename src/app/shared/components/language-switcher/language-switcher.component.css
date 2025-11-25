@@ -1,0 +1,10 @@
+/* Language switcher styles */
+button {
+  cursor: pointer;
+  user-select: none;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+

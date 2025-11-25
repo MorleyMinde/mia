@@ -1,0 +1,9 @@
+<button 
+  type="button"
+  (click)="toggleLanguage()"
+  class="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-muted/60 hover:bg-surface-muted transition-colors text-sm font-semibold text-ink shadow-sm hover:shadow-md"
+  [title]="'common.language' | translate">
+  <span class="text-base">🌐</span>
+  <span>{{ languageService.currentLanguage() === 'en' ? 'EN' : 'SW' }}</span>
+</button>
+

@@ -2,16 +2,19 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
 import { ProfileService } from '../../core/services/profile.service';
+import { LanguageService } from '../../core/services/language.service';
 import { Condition, LanguageCode, PatientProfile, ProviderProfile, UserRole } from '../../core/models/user-profile.model';
+import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-auth-shell',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, AsyncPipe],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, AsyncPipe, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './auth-shell.component.html',
   styleUrls: ['./auth-shell.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -21,6 +24,7 @@ export class AuthShellComponent {
   private readonly authService = inject(AuthService);
   private readonly profileService = inject(ProfileService);
   private readonly contextService = inject(ContextService);
+  private readonly languageService = inject(LanguageService);
   private readonly router = inject(Router);
 
   readonly selectedRole = signal<UserRole>('patient');
@@ -60,6 +64,11 @@ export class AuthShellComponent {
         }
         displayNameControl.updateValueAndValidity({ emitEvent: false });
       }
+    });
+
+    // Sync form language selection with app language
+    this.onboardingForm.get('language')?.valueChanges.subscribe((lang: LanguageCode) => {
+      this.languageService.setLanguage(lang as 'en' | 'sw');
     });
   }
 

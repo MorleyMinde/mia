@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { HealthEntry } from '../../core/models/daily-entry.model';
 import { PatientThresholds } from '../../core/models/user-profile.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -22,7 +23,7 @@ const defaultThresholds: PatientThresholds = {
 @Component({
   selector: 'app-patient-record',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './patient-record.component.html',
   styleUrls: ['./patient-record.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
