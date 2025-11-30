@@ -15,42 +15,42 @@ export class HealthRulesService {
 
     if (entry.bp && entry.bp.sys >= thresholds.bpSysVeryHigh) {
       status = 'red';
-      reasons.push('bp.sys.veryHigh');
+      reasons.push('reasons.bp.sys.veryHigh');
     } else if (entry.bp && entry.bp.sys >= thresholds.bpSysHigh) {
       status = this.pickHigher(status, 'yellow');
-      reasons.push('bp.sys.high');
+      reasons.push('reasons.bp.sys.high');
     }
 
     if (entry.bp && entry.bp.dia >= thresholds.bpDiaHigh) {
       status = this.pickHigher(status, 'yellow');
-      reasons.push('bp.dia.high');
+      reasons.push('reasons.bp.dia.high');
     }
 
     if (entry.glucose) {
       const { context, mmol } = entry.glucose;
       if (context === 'fasting' && mmol >= thresholds.glucoseVeryHigh) {
         status = 'red';
-        reasons.push('glucose.fast.veryHigh');
+        reasons.push('reasons.glucose.fast.veryHigh');
       } else if (context === 'random' && mmol >= thresholds.glucoseVeryHigh) {
         status = 'red';
-        reasons.push('glucose.random.veryHigh');
+        reasons.push('reasons.glucose.random.veryHigh');
       } else if (mmol >= (context === 'fasting' ? thresholds.glucoseFastingHigh : thresholds.glucoseRandomHigh)) {
         status = this.pickHigher(status, 'yellow');
-        reasons.push('glucose.high');
+        reasons.push('reasons.glucose.high');
       } else if (mmol <= thresholds.glucoseLow) {
         status = this.pickHigher(status, 'yellow');
-        reasons.push('glucose.low');
+        reasons.push('reasons.glucose.low');
       }
     }
 
     if (entry.meds && !entry.meds.taken) {
       status = this.pickHigher(status, 'yellow');
-      reasons.push('meds.missed');
+      reasons.push('reasons.meds.missed');
     }
 
     if (entry.alcohol && entry.alcohol > 2) {
       status = this.pickHigher(status, 'yellow');
-      reasons.push('alcohol.high');
+      reasons.push('reasons.alcohol.high');
     }
 
     return { status, reasons };

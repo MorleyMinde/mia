@@ -18,7 +18,9 @@
     "noResults": "Hakuna matokeo",
     "age": "Umri",
     "code": "Msimbo",
-    "actions": "Vitendo"
+    "actions": "Vitendo",
+    "alerts": "Maonyo",
+    "recommendations": "Mapendekezo"
   },
   "auth": {
     "signIn": "Ingia",
@@ -124,6 +126,40 @@
     "warning": "Onyo",
     "critical": "Hatari",
     "good": "Nzuri"
+  },
+  "actions": {
+    "contactProvider": "Wasiliana na mtoa huduma wako",
+    "takeMeds": "Tumia dawa zako",
+    "lightWalk": "Tembea kwa uangalifu",
+    "reduceSalt": "Punguza matumizi ya chumvi",
+    "keepRoutine": "Endelea na mazoezi yako"
+  },
+  "reasons": {
+    "bp": {
+      "sys": {
+        "veryHigh": "Shinikizo la juu la damu ni kubwa sana",
+        "high": "Shinikizo la juu la damu ni kubwa"
+      },
+      "dia": {
+        "high": "Shinikizo la chini la damu ni kubwa"
+      }
+    },
+    "glucose": {
+      "fast": {
+        "veryHigh": "Sukari ya njaa ni kubwa sana"
+      },
+      "random": {
+        "veryHigh": "Sukari ya bila mpango ni kubwa sana"
+      },
+      "high": "Sukari ni kubwa",
+      "low": "Sukari ni ndogo"
+    },
+    "meds": {
+      "missed": "Dawa zimekosa"
+    },
+    "alcohol": {
+      "high": "Matumizi ya pombe ni makubwa"
+    }
   },
   "languages": {
     "en": "Kiingereza",

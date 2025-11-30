@@ -18,7 +18,9 @@
     "noResults": "No results found",
     "age": "Age",
     "code": "Code",
-    "actions": "Actions"
+    "actions": "Actions",
+    "alerts": "Alerts",
+    "recommendations": "Recommendations"
   },
   "auth": {
     "signIn": "Sign in",
@@ -124,6 +126,40 @@
     "warning": "Warning",
     "critical": "Critical",
     "good": "Good"
+  },
+  "actions": {
+    "contactProvider": "Contact your provider",
+    "takeMeds": "Take your medications",
+    "lightWalk": "Take a light walk",
+    "reduceSalt": "Reduce salt intake",
+    "keepRoutine": "Keep up your routine"
+  },
+  "reasons": {
+    "bp": {
+      "sys": {
+        "veryHigh": "Systolic BP very high",
+        "high": "Systolic BP high"
+      },
+      "dia": {
+        "high": "Diastolic BP high"
+      }
+    },
+    "glucose": {
+      "fast": {
+        "veryHigh": "Fasting glucose very high"
+      },
+      "random": {
+        "veryHigh": "Random glucose very high"
+      },
+      "high": "Glucose high",
+      "low": "Glucose low"
+    },
+    "meds": {
+      "missed": "Medications missed"
+    },
+    "alcohol": {
+      "high": "Alcohol intake high"
+    }
   },
   "languages": {
     "en": "English",

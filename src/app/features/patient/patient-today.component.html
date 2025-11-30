@@ -30,7 +30,7 @@
     <!-- Actions from latest entry -->
     <div class="flex flex-wrap gap-2" *ngIf="latestEntry()?.actions?.length">
       <span *ngFor="let action of latestEntry()?.actions" class="rounded-full bg-surface-muted/60 px-3 py-1 text-xs text-ink">
-        {{ action }}
+        {{ action | translate }}
       </span>
     </div>
   </article>

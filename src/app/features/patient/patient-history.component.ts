@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { HealthEntry } from '../../core/models/daily-entry.model';
 import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
@@ -15,7 +16,7 @@ interface DayGroup {
 @Component({
   selector: 'app-patient-history',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './patient-history.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

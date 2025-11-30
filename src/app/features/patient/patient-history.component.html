@@ -81,24 +81,24 @@
 
           <!-- Status Reasons -->
           <div *ngIf="entry.statusReasons?.length" class="pt-2 border-t border-border/20">
-            <p class="text-[10px] text-muted uppercase tracking-wider mb-1">Alerts</p>
+            <p class="text-[10px] text-muted uppercase tracking-wider mb-1">{{ 'common.alerts' | translate }}</p>
             <div class="flex flex-wrap gap-1">
               <span 
                 *ngFor="let reason of entry.statusReasons" 
                 class="text-xs px-2 py-1 rounded-full bg-yellow-50 text-yellow-900">
-                {{ reason }}
+                {{ reason | translate }}
               </span>
             </div>
           </div>
 
           <!-- Actions -->
           <div *ngIf="entry.actions?.length" class="pt-2 border-t border-border/20">
-            <p class="text-[10px] text-muted uppercase tracking-wider mb-1">Recommendations</p>
+            <p class="text-[10px] text-muted uppercase tracking-wider mb-1">{{ 'common.recommendations' | translate }}</p>
             <div class="flex flex-wrap gap-1">
               <span 
                 *ngFor="let action of entry.actions" 
                 class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-900">
-                {{ action }}
+                {{ action | translate }}
               </span>
             </div>
           </div>
