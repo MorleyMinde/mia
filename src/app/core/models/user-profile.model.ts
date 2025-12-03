@@ -6,6 +6,7 @@ export interface PatientThresholds {
   bpSysHigh: number;
   bpDiaHigh: number;
   bpSysVeryHigh: number;
+  bpDiaVeryHigh: number;
   glucoseFastingHigh: number;
   glucoseRandomHigh: number;
   glucoseVeryHigh: number;

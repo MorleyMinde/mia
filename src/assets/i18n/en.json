@@ -132,17 +132,40 @@
     "takeMeds": "Take your medications",
     "lightWalk": "Take a light walk",
     "reduceSalt": "Reduce salt intake",
-    "keepRoutine": "Keep up your routine"
+    "keepRoutine": "Keep up your routine",
+    "seekImmediateCare": "Seek immediate medical attention",
+    "bpCrisis": "This is a hypertensive crisis. Your blood pressure is dangerously high.",
+    "glucoseVeryHigh": "Your glucose is very high. Monitor closely.",
+    "checkKetones": "Check for ketones if you have symptoms",
+    "glucoseVeryLow": "Your glucose is critically low. Treat immediately.",
+    "consumeGlucose": "Consume 15g fast-acting glucose (glucose tablets, juice, or candy)",
+    "reduceSaltImmediately": "Reduce salt intake immediately",
+    "monitorBP": "Monitor your blood pressure again in 2-4 hours",
+    "limitAlcohol": "Limit alcohol consumption",
+    "lifestyleChanges": "Focus on lifestyle changes to manage blood pressure",
+    "watchSalt": "Watch your salt intake",
+    "monitorGlucose": "Monitor your glucose levels",
+    "avoidSugaryFoods": "Avoid sugary foods and beverages",
+    "reduceCarbs": "Reduce carbohydrate intake",
+    "reviewMedsWithProvider": "Review your medications with your provider",
+    "missingMedsAffectsBP": "Missing medications may be affecting your blood pressure",
+    "missingMedsAffectsGlucose": "Missing medications may be affecting your glucose control",
+    "exerciseImportant": "Regular exercise is important for managing your condition",
+    "alcoholRaisesBP": "Alcohol can raise blood pressure",
+    "watchCarbs": "Watch your carbohydrate intake"
   },
   "reasons": {
     "bp": {
+      "crisis": "Hypertensive crisis - BP dangerously high",
       "sys": {
         "veryHigh": "Systolic BP very high",
         "high": "Systolic BP high"
       },
       "dia": {
+        "veryHigh": "Diastolic BP very high",
         "high": "Diastolic BP high"
-      }
+      },
+      "elevated": "Blood pressure elevated"
     },
     "glucose": {
       "fast": {
@@ -152,13 +175,20 @@
         "veryHigh": "Random glucose very high"
       },
       "high": "Glucose high",
-      "low": "Glucose low"
+      "low": "Glucose low",
+      "veryLow": "Glucose critically low"
     },
     "meds": {
       "missed": "Medications missed"
     },
     "alcohol": {
       "high": "Alcohol intake high"
+    },
+    "salt": {
+      "highWithBP": "High salt intake detected with elevated blood pressure"
+    },
+    "carb": {
+      "highWithGlucose": "High carbohydrate intake detected with elevated glucose"
     }
   },
   "languages": {

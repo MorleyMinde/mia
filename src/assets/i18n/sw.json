@@ -132,17 +132,40 @@
     "takeMeds": "Tumia dawa zako",
     "lightWalk": "Tembea kwa uangalifu",
     "reduceSalt": "Punguza matumizi ya chumvi",
-    "keepRoutine": "Endelea na mazoezi yako"
+    "keepRoutine": "Endelea na mazoezi yako",
+    "seekImmediateCare": "Tafuta huduma za matibabu haraka sana",
+    "bpCrisis": "Hii ni hali ya hatari ya shinikizo la damu. Shinikizo la damu lako ni kubwa sana.",
+    "glucoseVeryHigh": "Sukari yako ni kubwa sana. Fuata kwa karibu.",
+    "checkKetones": "Angalia ketoni ikiwa una dalili",
+    "glucoseVeryLow": "Sukari yako ni ndogo sana. Tiba mara moja.",
+    "consumeGlucose": "Tumia sukari ya haraka ya 15g (vidonge vya sukari, juisi, au pipi)",
+    "reduceSaltImmediately": "Punguza matumizi ya chumvi mara moja",
+    "monitorBP": "Angalia shinikizo la damu lako tena baada ya masaa 2-4",
+    "limitAlcohol": "Punguza matumizi ya pombe",
+    "lifestyleChanges": "Zingatia mabadiliko ya maisha ili kusimamia shinikizo la damu",
+    "watchSalt": "Angalia matumizi yako ya chumvi",
+    "monitorGlucose": "Angalia viwango vya sukari yako",
+    "avoidSugaryFoods": "Epuka vyakula na vinywaji vya sukari",
+    "reduceCarbs": "Punguza matumizi ya wanga",
+    "reviewMedsWithProvider": "Rudia dawa zako na mtoa huduma wako",
+    "missingMedsAffectsBP": "Kukosa dawa kunaweza kuathiri shinikizo la damu lako",
+    "missingMedsAffectsGlucose": "Kukosa dawa kunaweza kuathiri udhibiti wa sukari yako",
+    "exerciseImportant": "Mazoezi ya mara kwa mara ni muhimu kwa kusimamia hali yako",
+    "alcoholRaisesBP": "Pombe inaweza kuongeza shinikizo la damu",
+    "watchCarbs": "Angalia matumizi yako ya wanga"
   },
   "reasons": {
     "bp": {
+      "crisis": "Hali ya hatari ya shinikizo la damu - shinikizo ni kubwa sana",
       "sys": {
         "veryHigh": "Shinikizo la juu la damu ni kubwa sana",
         "high": "Shinikizo la juu la damu ni kubwa"
       },
       "dia": {
+        "veryHigh": "Shinikizo la chini la damu ni kubwa sana",
         "high": "Shinikizo la chini la damu ni kubwa"
-      }
+      },
+      "elevated": "Shinikizo la damu limeongezeka"
     },
     "glucose": {
       "fast": {
@@ -152,13 +175,20 @@
         "veryHigh": "Sukari ya bila mpango ni kubwa sana"
       },
       "high": "Sukari ni kubwa",
-      "low": "Sukari ni ndogo"
+      "low": "Sukari ni ndogo",
+      "veryLow": "Sukari ni ndogo sana"
     },
     "meds": {
       "missed": "Dawa zimekosa"
     },
     "alcohol": {
       "high": "Matumizi ya pombe ni makubwa"
+    },
+    "salt": {
+      "highWithBP": "Matumizi makubwa ya chumvi yamegunduliwa na shinikizo la damu limeongezeka"
+    },
+    "carb": {
+      "highWithGlucose": "Matumizi makubwa ya wanga yamegunduliwa na sukari imeongezeka"
     }
   },
   "languages": {

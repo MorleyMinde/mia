@@ -4,16 +4,18 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HealthEntry } from '../../core/models/daily-entry.model';
-import { PatientThresholds } from '../../core/models/user-profile.model';
+import { Condition, PatientProfile, PatientThresholds } from '../../core/models/user-profile.model';
 import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
 import { EntryService } from '../../core/services/entry.service';
 import { HealthRulesService } from '../../core/services/health-rules.service';
+import { ProfileService } from '../../core/services/profile.service';
 
 const defaultThresholds: PatientThresholds = {
   bpSysHigh: 140,
   bpDiaHigh: 90,
   bpSysVeryHigh: 180,
+  bpDiaVeryHigh: 120,
   glucoseFastingHigh: 7,
   glucoseRandomHigh: 10,
   glucoseVeryHigh: 13,
@@ -35,9 +37,15 @@ export class PatientRecordComponent {
   private readonly context = inject(ContextService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly profileService = inject(ProfileService);
 
   readonly status = signal<'idle' | 'saving' | 'error' | 'success'>('idle');
   readonly errorMessage = signal<string | null>(null);
+  
+  // Patient profile data
+  readonly patientProfile = signal<PatientProfile | null>(null);
+  readonly patientConditions = computed(() => this.patientProfile()?.conditions ?? []);
+  readonly patientThresholds = computed(() => this.patientProfile()?.thresholds ?? defaultThresholds);
   
   // Track which sections are expanded
   readonly expandedSections = signal<Set<string>>(new Set(['bp']));
@@ -106,6 +114,25 @@ export class PatientRecordComponent {
   });
 
   constructor() {
+    // Load patient profile to get conditions and thresholds
+    effect((onCleanup) => {
+      const patientId = this.activePatientId();
+      if (!patientId) {
+        this.patientProfile.set(null);
+        return;
+      }
+      
+      const profileSub = this.profileService.listenToProfile(patientId).subscribe(profile => {
+        if (profile && profile.role === 'patient') {
+          this.patientProfile.set(profile);
+        } else {
+          this.patientProfile.set(null);
+        }
+      });
+      
+      onCleanup(() => profileSub.unsubscribe());
+    });
+
     // Load previous medications and herbs from user's entry history
     effect((onCleanup) => {
       const patientId = this.activePatientId();
@@ -301,11 +328,14 @@ export class PatientRecordComponent {
         updatedAt: new Date()
       };
 
-      const statusResult = this.healthRules.computeStatus(entry, defaultThresholds);
+      const thresholds = this.patientThresholds();
+      const conditions = this.patientConditions();
+      
+      const statusResult = this.healthRules.computeStatus(entry, thresholds, conditions);
       entry.status = statusResult.status;
       entry.statusReasons = statusResult.reasons;
-      entry.riskScore = this.healthRules.computeRiskScore(entry, defaultThresholds);
-      entry.actions = this.healthRules.generateActions(entry, statusResult);
+      entry.riskScore = this.healthRules.computeRiskScore(entry, thresholds, conditions);
+      entry.actions = this.healthRules.generateActions(entry, statusResult, conditions, thresholds);
 
       console.log('=== SAVING ENTRY ===');
       console.log('Patient ID:', this.activePatientId());
