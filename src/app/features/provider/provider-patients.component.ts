@@ -100,9 +100,13 @@ export class ProviderPatientsComponent {
       }
     }
 
-    // View as this patient
+    // View as this patient - navigate with UID in URL
     this.context.viewAsPatient(patient.uid);
-    this.router.navigate(['/provider/dashboard']);
+    this.router.navigate(['/provider/patient', patient.uid]);
+  }
+
+  registerPatient() {
+    this.router.navigate(['/provider/register-patient']);
   }
 
   getAge(yearOfBirth: number): string {

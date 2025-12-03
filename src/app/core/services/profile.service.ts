@@ -23,13 +23,23 @@ export class ProfileService {
 
   async upsertProfile(profile: UserProfile) {
     const reference = doc(this.firestore, 'users', profile.uid) as DocumentReference<UserProfile>;
-    const profileWithLowercase = {
+    const profileWithLowercase: any = {
       ...profile,
       displayNameLower: profile.displayName.toLowerCase(),
       updatedAt: new Date(),
       createdAt: profile.createdAt ?? new Date()
     };
-    await setDoc(reference, profileWithLowercase, { merge: true });
+
+    // Firestore does not allow undefined field values; strip them out
+    const cleanProfile: any = {};
+    Object.keys(profileWithLowercase).forEach((key) => {
+      const value = profileWithLowercase[key];
+      if (value !== undefined) {
+        cleanProfile[key] = value;
+      }
+    });
+
+    await setDoc(reference, cleanProfile, { merge: true });
   }
 
   async updatePartial(uid: string, patch: Partial<UserProfile>) {

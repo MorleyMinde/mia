@@ -73,7 +73,19 @@
     "typeAtLeast2": "Andika angalau herufi 2",
     "noPatientsFound": "Hakuna wagonjwa wamepatikana",
     "searchByNamePrompt": "Tafuta wagonjwa kwa majina yao",
-    "backToList": "Rudi kwenye Orodha"
+    "backToList": "Rudi kwenye Orodha",
+    "registerPatient": "Sajili Mgonjwa",
+    "registerPatientDescription": "Unda akaunti kwa mgonjwa ambaye anaweza asiwe na simu janja. Unaweza kumpa maelezo ya kuingia baadaye.",
+    "patientRegistered": "Mgonjwa amesajiliwa kwa mafanikio",
+    "providerSignedOut": "Umetolewa kwenye akaunti baada ya kuunda akaunti ya mgonjwa.",
+    "pleaseSignInAgain": "Tafadhali ingia tena ili kuendelea kusimamia wagonjwa.",
+    "shareCredentials": "Shiriki maelezo haya na mgonjwa ili aweze kuingia baadaye:",
+    "shareCode": "Msimbo wa kushiriki",
+    "patientCanLoginLater": "Mgonjwa anaweza kutumia barua pepe hii na nywila kuingia baadaye na kuona taarifa zake.",
+    "viewPatient": "Tazama mgonjwa",
+    "registerAnother": "Sajili mgonjwa mwingine",
+    "emailForLogin": "Barua pepe hii itatumika na mgonjwa kuingia.",
+    "passwordForLogin": "Weka nywila rahisi ya muda ambayo unaweza kushiriki na mgonjwa."
   },
   "record": {
     "when": "Lini?",
@@ -190,6 +202,10 @@
     "carb": {
       "highWithGlucose": "Matumizi makubwa ya wanga yamegunduliwa na sukari imeongezeka"
     }
+  },
+  "conditions": {
+    "hypertension": "Shinikizo la juu la damu",
+    "diabetes": "Kisukari"
   },
   "languages": {
     "en": "Kiingereza",

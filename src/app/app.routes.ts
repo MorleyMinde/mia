@@ -50,8 +50,12 @@ export const routes: Routes = [
         loadComponent: () => import('./features/provider/provider-home.component').then((m) => m.ProviderHomeComponent)
       },
       {
-        path: 'dashboard',
+        path: 'patient/:uid',
         loadComponent: () => import('./features/provider/provider-patient-dashboard.component').then((m) => m.ProviderPatientDashboardComponent)
+      },
+      {
+        path: 'register-patient',
+        loadComponent: () => import('./features/provider/provider-register-patient.component').then((m) => m.ProviderRegisterPatientComponent)
       },
       {
         path: 'record',

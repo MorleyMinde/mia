@@ -73,7 +73,19 @@
     "typeAtLeast2": "Type at least 2 characters",
     "noPatientsFound": "No patients found",
     "searchByNamePrompt": "Search for patients by their name",
-    "backToList": "Back to List"
+    "backToList": "Back to List",
+    "registerPatient": "Register Patient",
+    "registerPatientDescription": "Create an account for a patient who may not have a smartphone. You can give them the login later.",
+    "patientRegistered": "Patient registered successfully",
+    "providerSignedOut": "You have been signed out after creating the patient account.",
+    "pleaseSignInAgain": "Please sign in again to continue managing patients.",
+    "shareCredentials": "Share these details with the patient so they can log in later:",
+    "shareCode": "Share code",
+    "patientCanLoginLater": "The patient can use this email and password to log in later and view their information.",
+    "viewPatient": "View patient",
+    "registerAnother": "Register another patient",
+    "emailForLogin": "This email will be used by the patient to log in.",
+    "passwordForLogin": "Set a simple, temporary password you can share with the patient."
   },
   "record": {
     "when": "When?",
@@ -190,6 +202,10 @@
     "carb": {
       "highWithGlucose": "High carbohydrate intake detected with elevated glucose"
     }
+  },
+  "conditions": {
+    "hypertension": "Hypertension",
+    "diabetes": "Diabetes"
   },
   "languages": {
     "en": "English",

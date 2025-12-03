@@ -4,13 +4,12 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
-import { ProviderPatientsComponent } from './provider-patients.component';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-provider-shell',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterOutlet, ProviderPatientsComponent, TranslateModule, LanguageSwitcherComponent],
+  imports: [CommonModule, RouterLink, RouterOutlet, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './provider-shell.component.html',
   styleUrls: ['./provider-shell.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -22,8 +21,7 @@ export class ProviderShellComponent {
   private readonly screenWidth = signal(typeof window !== 'undefined' ? window.innerWidth : 1024);
   readonly isDesktop = computed(() => this.screenWidth() >= 1024);
 
-  readonly viewingPatientId = computed(() => this.context.context().actingAsPatientId);
-  readonly hasActivePatient = computed(() => !!this.viewingPatientId());
+  constructor() {}
 
   readonly navItems = [
     { label: 'Patients', path: '/provider', icon: '👥' },
@@ -58,14 +56,8 @@ export class ProviderShellComponent {
   }
 
   showListPanel(): boolean {
-    // Show list only when no patient is selected
-    // Once a patient is selected, hide the list on all screen sizes
-    return !this.hasActivePatient();
-  }
-
-  showDetailPanel(): boolean {
-    // Show details only when a patient is selected
-    return this.hasActivePatient();
+    // List panel is no longer used in the shell layout
+    return false;
   }
 
   backToList() {

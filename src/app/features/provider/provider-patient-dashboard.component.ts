@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HealthEntry } from '../../core/models/daily-entry.model';
 import { PatientProfile } from '../../core/models/user-profile.model';
@@ -23,12 +23,19 @@ export class ProviderPatientDashboardComponent {
   private readonly context = inject(ContextService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly profile = signal<PatientProfile | null>(null);
   readonly entries = signal<HealthEntry[]>([]);
   readonly loading = signal(true);
 
-  readonly activePatientId = computed(() => this.context.context().actingAsPatientId);
+  readonly routePatientId = signal<string | null>(null);
+  
+  readonly activePatientId = computed(() => {
+    // First try to get from route params (check both signal and snapshot for reliability)
+    const routeUid = this.routePatientId() || this.route.snapshot.paramMap.get('uid');
+    return routeUid || this.context.context().actingAsPatientId;
+  });
   readonly latestEntry = computed(() => this.entries()[0] ?? null);
   readonly recentEntries = computed(() => this.entries().slice(0, 7));
   
@@ -39,10 +46,31 @@ export class ProviderPatientDashboardComponent {
   readonly avgGlucose = computed(() => this.average(this.entries().slice(0, 7).map((entry) => entry.glucose?.mmol).filter((v): v is number => !!v)));
 
   constructor() {
+    // Initialize from snapshot first (for initial load/reload)
+    const initialUid = this.route.snapshot.paramMap.get('uid');
+    if (initialUid) {
+      this.routePatientId.set(initialUid);
+      this.context.viewAsPatient(initialUid);
+    }
+
+    // Subscribe to route params for navigation changes
+    this.route.paramMap.subscribe(params => {
+      const uid = params.get('uid');
+      this.routePatientId.set(uid);
+      if (uid) {
+        this.context.viewAsPatient(uid);
+      }
+    });
+
     effect((onCleanup) => {
       const patientId = this.activePatientId();
+      
       if (!patientId) {
-        this.router.navigate(['/provider']);
+        // Only navigate away if we're definitely not on a patient route
+        const routeUid = this.route.snapshot.paramMap.get('uid');
+        if (!routeUid) {
+          this.router.navigate(['/provider']);
+        }
         return;
       }
 
@@ -90,7 +118,12 @@ export class ProviderPatientDashboardComponent {
   }
 
   goToRecord() {
-    this.router.navigate(['/provider/record']);
+    const patientId = this.activePatientId();
+    if (patientId) {
+      this.router.navigate(['/provider/record'], { queryParams: { patient: patientId } });
+    } else {
+      this.router.navigate(['/provider/record']);
+    }
   }
 
   getAge(yearOfBirth: number | undefined): string {
@@ -98,6 +131,11 @@ export class ProviderPatientDashboardComponent {
     const currentYear = new Date().getFullYear();
     const age = currentYear - yearOfBirth;
     return `${age} years`;
+  }
+
+  backToPatients() {
+    this.context.exitViewAs();
+    this.router.navigate(['/provider']);
   }
 
   private computeStreak(entries: HealthEntry[]): number {

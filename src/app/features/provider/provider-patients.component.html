@@ -1,7 +1,9 @@
 <section class="space-y-4 p-4">
   <div class="space-y-2">
-    <h2 class="text-xl font-semibold text-ink">{{ 'provider.searchPatients' | translate }}</h2>
-    <p class="text-sm text-muted">{{ 'provider.searchByName' | translate }}</p>
+    <div>
+      <h2 class="text-xl font-semibold text-ink">{{ 'provider.searchPatients' | translate }}</h2>
+      <p class="text-sm text-muted">{{ 'provider.searchByName' | translate }}</p>
+    </div>
   </div>
 
   <div class="space-y-3">
@@ -14,6 +16,13 @@
         autocomplete="off">
       <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xl">🔍</span>
     </div>
+
+    <button 
+      type="button" 
+      class="pill-button w-full text-sm px-4 py-2"
+      (click)="registerPatient()">
+      ➕ {{ 'provider.registerPatient' | translate }}
+    </button>
 
     <p class="text-xs text-danger" *ngIf="errorMessage()">{{ errorMessage() }}</p>
     

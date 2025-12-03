@@ -222,7 +222,12 @@ export class PatientRecordComponent {
     // Navigate back based on current role
     const currentRole = this.creatorRole();
     if (currentRole === 'provider') {
-      this.router.navigate(['/provider/dashboard']);
+      const patientId = this.activePatientId();
+      if (patientId) {
+        this.router.navigate(['/provider/patient', patientId]);
+      } else {
+        this.router.navigate(['/provider']);
+      }
     } else {
       this.router.navigate(['/patient']);
     }
@@ -354,8 +359,14 @@ export class PatientRecordComponent {
       
       // Navigate based on role
       if (this.creatorRole() === 'provider') {
-        console.log('Navigating to /provider/dashboard');
-        await this.router.navigate(['/provider/dashboard']);
+        const patientId = this.activePatientId();
+        if (patientId) {
+          console.log('Navigating to /provider/patient/', patientId);
+          await this.router.navigate(['/provider/patient', patientId]);
+        } else {
+          console.log('Navigating to /provider');
+          await this.router.navigate(['/provider']);
+        }
       } else {
         console.log('Navigating to /patient');
         await this.router.navigate(['/patient']);

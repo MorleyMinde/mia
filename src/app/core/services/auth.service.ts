@@ -57,4 +57,23 @@ export class AuthService {
     );
     return awaited;
   }
+
+  /**
+   * Create a user account for a patient (provider use case)
+   * Note: This will sign out the current user. The caller should handle restoring the session.
+   */
+  async createPatientAccount(displayName: string, email: string, password: string): Promise<FirebaseUser> {
+    // Store current user info before creating patient account
+    const currentUser = this._user();
+    const currentUserId = currentUser?.uid;
+    
+    // Create patient account (this will sign out current user)
+    const patientUser = await firstValueFrom(
+      this.signUpWithEmail(displayName, email, password)
+    );
+    
+    // Note: The current provider session is lost. In production, use Firebase Admin SDK via Cloud Function
+    // For now, the provider will need to sign back in
+    return patientUser;
+  }
 }
