@@ -217,7 +217,8 @@ export class HealthRulesService {
     conditions: Condition[] = [],
     thresholds?: PatientThresholds
   ): string[] {
-    const actions: string[] = [];
+    // Use a Set to prevent duplicate actions
+    const actionsSet = new Set<string>();
     const hasHypertension = conditions.includes('hypertension');
     const hasDiabetes = conditions.includes('diabetes');
     
@@ -233,6 +234,11 @@ export class HealthRulesService {
       glucoseLow: 3.9
     };
 
+    // Helper function to add action only if not already present
+    const addAction = (action: string) => {
+      actionsSet.add(action);
+    };
+
     // RED STATUS - Immediate actions
     if (result.status === 'red') {
       // Hypertensive crisis
@@ -240,18 +246,18 @@ export class HealthRulesService {
         entry.bp &&
         (entry.bp.sys >= thresholdsToUse.bpSysVeryHigh || entry.bp.dia >= thresholdsToUse.bpDiaVeryHigh)
       ) {
-        actions.push('actions.seekImmediateCare');
-        actions.push('actions.bpCrisis');
+        addAction('actions.seekImmediateCare');
+        addAction('actions.bpCrisis');
       }
       // Very high glucose
       else if (
         entry.glucose &&
         entry.glucose.mmol >= thresholdsToUse.glucoseVeryHigh
       ) {
-        actions.push('actions.contactProvider');
-        actions.push('actions.glucoseVeryHigh');
+        addAction('actions.contactProvider');
+        addAction('actions.glucoseVeryHigh');
         if (hasDiabetes) {
-          actions.push('actions.checkKetones');
+          addAction('actions.checkKetones');
         }
       }
       // Very low glucose
@@ -259,13 +265,13 @@ export class HealthRulesService {
         entry.glucose &&
         entry.glucose.mmol < 3.0
       ) {
-        actions.push('actions.seekImmediateCare');
-        actions.push('actions.glucoseVeryLow');
-        actions.push('actions.consumeGlucose');
+        addAction('actions.seekImmediateCare');
+        addAction('actions.glucoseVeryLow');
+        addAction('actions.consumeGlucose');
       }
       // Generic red status
       else {
-        actions.push('actions.contactProvider');
+        addAction('actions.contactProvider');
       }
     }
 
@@ -279,16 +285,16 @@ export class HealthRulesService {
         entry.bp.dia < thresholdsToUse.bpDiaVeryHigh
       ) {
         if (entry.food && entry.food.salt >= 4) {
-          actions.push('actions.reduceSaltImmediately');
+          addAction('actions.reduceSaltImmediately');
         } else {
-          actions.push('actions.reduceSalt');
+          addAction('actions.reduceSalt');
         }
-        actions.push('actions.monitorBP');
+        addAction('actions.monitorBP');
         if (!entry.exercise || entry.exercise.minutes < 30) {
-          actions.push('actions.lightWalk');
+          addAction('actions.lightWalk');
         }
         if (entry.alcohol && entry.alcohol > 1) {
-          actions.push('actions.limitAlcohol');
+          addAction('actions.limitAlcohol');
         }
       }
 
@@ -300,9 +306,12 @@ export class HealthRulesService {
         entry.bp.dia >= 80 &&
         entry.bp.dia < thresholdsToUse.bpDiaHigh
       ) {
-        actions.push('actions.lifestyleChanges');
-        if (entry.food && entry.food.salt >= 3) {
-          actions.push('actions.watchSalt');
+        addAction('actions.lifestyleChanges');
+        // Only add watchSalt if we haven't already added a more urgent salt action
+        if (entry.food && entry.food.salt >= 3 && 
+            !actionsSet.has('actions.reduceSalt') && 
+            !actionsSet.has('actions.reduceSaltImmediately')) {
+          addAction('actions.watchSalt');
         }
       }
 
@@ -314,77 +323,84 @@ export class HealthRulesService {
 
         if (mmol >= threshold && mmol < thresholdsToUse.glucoseVeryHigh) {
           if (entry.meds && !entry.meds.taken) {
-            actions.push('actions.takeMeds');
-            actions.push('actions.monitorGlucose');
+            addAction('actions.takeMeds');
+            addAction('actions.monitorGlucose');
           } else {
-            actions.push('actions.avoidSugaryFoods');
-            actions.push('actions.monitorGlucose');
+            addAction('actions.avoidSugaryFoods');
+            addAction('actions.monitorGlucose');
           }
           if (entry.food && entry.food.carb >= 4) {
-            actions.push('actions.reduceCarbs');
+            addAction('actions.reduceCarbs');
           }
         }
 
-        // Low glucose (not critical but still warning)
-        if (mmol <= 3.9 && mmol >= 3.0) {
-          actions.push('actions.consumeGlucose');
-          actions.push('actions.monitorGlucose');
+        // Low glucose (not critical but still warning) - only if not already added for very low
+        if (mmol <= 3.9 && mmol >= 3.0 && result.status !== 'red') {
+          addAction('actions.consumeGlucose');
+          addAction('actions.monitorGlucose');
           if (entry.meds) {
-            actions.push('actions.reviewMedsWithProvider');
+            addAction('actions.reviewMedsWithProvider');
           }
         }
       }
 
       // Medication adherence
       if (entry.meds && !entry.meds.taken) {
-        actions.push('actions.takeMeds');
+        addAction('actions.takeMeds');
         if (hasHypertension && entry.bp && (entry.bp.sys >= thresholdsToUse.bpSysHigh || entry.bp.dia >= thresholdsToUse.bpDiaHigh)) {
-          actions.push('actions.missingMedsAffectsBP');
+          addAction('actions.missingMedsAffectsBP');
         }
         if (hasDiabetes && entry.glucose && entry.glucose.mmol >= thresholdsToUse.glucoseFastingHigh) {
-          actions.push('actions.missingMedsAffectsGlucose');
+          addAction('actions.missingMedsAffectsGlucose');
         }
       }
 
-      // Lifestyle factors
+      // Lifestyle factors - only add if not already added in BP section
       if (!entry.exercise || entry.exercise.minutes < 30) {
         if (hasHypertension || hasDiabetes) {
-          actions.push('actions.exerciseImportant');
+          addAction('actions.exerciseImportant');
         }
-        actions.push('actions.lightWalk');
+        addAction('actions.lightWalk');
       }
 
-      // High salt (especially for hypertension)
+      // High salt (especially for hypertension) - only add if not already added in BP section
       if (entry.food && entry.food.salt >= 4) {
-        if (hasHypertension) {
-          actions.push('actions.reduceSaltImmediately');
-        } else {
-          actions.push('actions.reduceSalt');
+        // Only add if reduceSalt/reduceSaltImmediately wasn't already added
+        if (!actionsSet.has('actions.reduceSalt') && !actionsSet.has('actions.reduceSaltImmediately')) {
+          if (hasHypertension) {
+            addAction('actions.reduceSaltImmediately');
+          } else {
+            addAction('actions.reduceSalt');
+          }
         }
       }
 
-      // High alcohol
+      // High alcohol - only add if not already added in BP section
       if (entry.alcohol && entry.alcohol > 2) {
-        actions.push('actions.limitAlcohol');
+        addAction('actions.limitAlcohol');
         if (hasHypertension) {
-          actions.push('actions.alcoholRaisesBP');
+          addAction('actions.alcoholRaisesBP');
         }
       }
     }
 
     // GREEN STATUS or default
-    if (actions.length === 0) {
-      actions.push('actions.keepRoutine');
+    if (actionsSet.size === 0) {
+      addAction('actions.keepRoutine');
       // Still provide gentle reminders if relevant
-      if (hasHypertension && entry.food && entry.food.salt >= 3) {
-        actions.push('actions.watchSalt');
+      // Only add watchSalt if we haven't already added a more urgent salt action
+      if (hasHypertension && entry.food && entry.food.salt >= 3 &&
+          !actionsSet.has('actions.reduceSalt') && 
+          !actionsSet.has('actions.reduceSaltImmediately')) {
+        addAction('actions.watchSalt');
       }
       if (hasDiabetes && entry.food && entry.food.carb >= 3) {
-        actions.push('actions.watchCarbs');
+        addAction('actions.watchCarbs');
       }
     }
 
-    return actions;
+    // Convert Set to array and return
+    return Array.from(actionsSet);
   }
 
   private pickHigher(

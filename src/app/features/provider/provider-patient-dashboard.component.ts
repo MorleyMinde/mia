@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { HealthEntry } from '../../core/models/daily-entry.model';
 import { PatientProfile } from '../../core/models/user-profile.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -11,7 +12,7 @@ import { ProfileService } from '../../core/services/profile.service';
 @Component({
   selector: 'app-provider-patient-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './provider-patient-dashboard.component.html',
   styleUrls: ['./provider-patient-dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -57,9 +57,9 @@
     </div>
 
     <div *ngIf="latestEntry()?.actions?.length" class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
-      <p class="text-sm font-semibold text-amber-900 mb-2">📌 Recommended Actions</p>
+      <p class="text-sm font-semibold text-amber-900 mb-2">📌 {{ 'common.recommendations' | translate }}</p>
       <ul class="space-y-1">
-        <li *ngFor="let action of latestEntry()?.actions" class="text-sm text-amber-800">• {{ action }}</li>
+        <li *ngFor="let action of latestEntry()?.actions" class="text-sm text-amber-800">• {{ action | translate }}</li>
       </ul>
     </div>
   </section>
