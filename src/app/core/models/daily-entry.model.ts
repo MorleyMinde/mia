@@ -16,6 +16,9 @@ export interface HealthEntry {
   timestamp: Date; // Full date and time when the measurement was taken
   bp?: BloodPressurePayload;
   glucose?: GlucosePayload;
+  weight?: number; // Weight in kilograms (kg)
+  height?: number; // Height in centimeters (cm)
+  bmi?: number; // Body Mass Index (calculated from weight and height)
   meds?: { taken: boolean; names?: string[] };
   food?: { salt: 1 | 2 | 3 | 4 | 5; carb: 1 | 2 | 3 | 4 | 5; notes?: string };
   exercise?: { minutes: number };

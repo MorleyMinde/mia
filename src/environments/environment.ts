@@ -21,7 +21,7 @@ export const environment = {
         },
         firestore: {
             host: "localhost",
-            port: 8080
+            port: 8090
         }
     }
 };

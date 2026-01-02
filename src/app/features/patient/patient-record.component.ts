@@ -73,6 +73,8 @@ export class PatientRecordComponent {
       mmol: [null as number | null],
       context: ['random']
     }),
+    weight: [null as number | null],
+    height: [null as number | null],
     medsTaken: [false],
     food: this.fb.group({
       salt: [3],
@@ -238,6 +240,8 @@ export class PatientRecordComponent {
     return !!(
       (raw.bp?.sys != null || raw.bp?.dia != null) ||
       raw.glucose?.mmol != null ||
+      raw.weight != null ||
+      raw.height != null ||
       this.selectedMeds().length > 0 ||
       raw.food?.notes ||
       (raw.food?.salt !== 3) ||
@@ -261,6 +265,8 @@ export class PatientRecordComponent {
     const hasData = 
       (raw.bp?.sys != null && raw.bp?.dia != null) ||
       raw.glucose?.mmol != null ||
+      raw.weight != null ||
+      raw.height != null ||
       this.selectedMeds().length > 0 ||
       raw.food?.notes ||
       (raw.exercise?.minutes && raw.exercise.minutes > 0) ||
@@ -309,10 +315,20 @@ export class PatientRecordComponent {
           ? { minutes: Number(raw.exercise.minutes) } 
           : undefined;
 
+      // Calculate BMI if both weight and height are provided
+      const weight = raw.weight != null ? Number(raw.weight) : undefined;
+      const height = raw.height != null ? Number(raw.height) : undefined;
+      const bmi = weight != null && height != null && height > 0
+        ? Number((weight / Math.pow(height / 100, 2)).toFixed(1))
+        : undefined;
+
       const entry: HealthEntry = {
         timestamp,
         bp,
         glucose,
+        weight,
+        height,
+        bmi,
         meds: this.selectedMeds().length > 0 ? {
           taken: raw.medsTaken ?? false,
           names: this.selectedMeds()
@@ -389,5 +405,23 @@ export class PatientRecordComponent {
 
   private createTimestamp(dateStr: string, timeStr: string): Date {
     return new Date(`${dateStr}T${timeStr}:00`);
+  }
+
+  calculateBMI(): number | null {
+    const raw = this.form.getRawValue();
+    const weight = raw.weight != null ? Number(raw.weight) : null;
+    const height = raw.height != null ? Number(raw.height) : null;
+    
+    if (weight != null && height != null && height > 0) {
+      return Number((weight / Math.pow(height / 100, 2)).toFixed(1));
+    }
+    return null;
+  }
+
+  getBMICategory(bmi: number): string {
+    if (bmi < 18.5) return 'underweight';
+    if (bmi < 25) return 'normal';
+    if (bmi < 30) return 'overweight';
+    return 'obese';
   }
 }
