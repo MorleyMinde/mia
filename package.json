@@ -8,8 +8,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "emulators": "firebase emulators:start --import ./.firebase/emulator-data --export-on-exit ./.firebase/emulator-data",
-    "emulators:exec": "firebase emulators:exec --import ./.firebase/emulator-data --export-on-exit ./.firebase/emulator-data",
+    "emulators": "firebase emulators:start --project mtuniafya-cc8fb --only firestore,functions,hosting,auth,storage --import=firebase-export-latest --export-on-exit=firebase-export-latest",
+    "emulators:exec": "firebase emulators:exec  --import=firebase-export-latest --export-on-exit=firebase-export-latest",
     "emulators:export": "firebase emulators:export ./.firebase/emulator-data",
     "emulators:import": "firebase emulators:import ./.firebase/emulator-data",
     "emulators:clean": "node -e \"require('fs').rmSync('.firebase/emulator-data', { recursive: true, force: true });\""

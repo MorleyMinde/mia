@@ -64,6 +64,7 @@
     "dashboard": "Provider Dashboard",
     "managePatients": "Manage your patients",
     "searchPatients": "Search Patients",
+    "patients": "Patients",
     "searchByName": "Search by patient name...",
     "findByNameOrCode": "Find by name or share code",
     "selectPatient": "Select a patient",
@@ -85,7 +86,13 @@
     "viewPatient": "View patient",
     "registerAnother": "Register another patient",
     "emailForLogin": "This email will be used by the patient to log in.",
-    "passwordForLogin": "Set a simple, temporary password you can share with the patient."
+    "passwordForLogin": "Set a simple, temporary password you can share with the patient.",
+    "profileDescription": "Use \"My Patients\" to search by name or share code, then jump into Today/Record to help them log entries.",
+    "facilityName": "Facility Name",
+    "providerType": "Provider Type",
+    "facilityNamePlaceholder": "e.g., Health Center",
+    "providerTypePlaceholder": "e.g., Nurse, Doctor",
+    "noProfileData": "No profile data."
   },
   "record": {
     "when": "When?",
@@ -224,6 +231,15 @@
   "languages": {
     "en": "English",
     "sw": "Swahili"
+  },
+  "nav": {
+    "myHealth": "My Health",
+    "provider": "Provider"
+  },
+  "profile": {
+    "edit": "Edit",
+    "editProfile": "Edit Profile",
+    "displayNameRequired": "Display name is required"
   }
 }
 

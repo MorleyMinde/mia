@@ -21,14 +21,11 @@ export class ProviderShellComponent {
   private readonly screenWidth = signal(typeof window !== 'undefined' ? window.innerWidth : 1024);
   readonly isDesktop = computed(() => this.screenWidth() >= 1024);
 
-  constructor() {}
-
+  // Provider navigation items
   readonly navItems = [
-    { label: 'Patients', path: '/provider', icon: '👥' },
-    { label: 'Today', path: '/provider/today', icon: '🩺', requiresPatient: true },
-    { label: 'Record', path: '/provider/record', icon: '✍️', requiresPatient: true },
-    { label: 'History', path: '/provider/history', icon: '📅', requiresPatient: true },
-    { label: 'Insights', path: '/provider/insights', icon: '📊', requiresPatient: true }
+    { label: 'provider.patients', icon: '👥', path: '/provider' },
+    { label: 'provider.registerPatient', icon: '➕', path: '/provider/register-patient' },
+    //{ label: 'auth.profile', icon: '🙂', path: '/provider/profile' }
   ];
 
   exitViewAs() {
@@ -38,7 +35,6 @@ export class ProviderShellComponent {
 
   async logout() {
     await this.authService.signOut();
-    this.context.setRole('patient');
     this.context.exitViewAs();
     await this.router.navigate(['/auth']);
   }

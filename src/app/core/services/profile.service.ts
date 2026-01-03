@@ -5,16 +5,22 @@ import {
   collection,
   doc,
   docData,
+  getDoc,
   serverTimestamp,
   setDoc,
   updateDoc
 } from '@angular/fire/firestore';
-import { Observable, map } from 'rxjs';
-import { UserProfile } from '../models/user-profile.model';
+import { Observable, map, of, firstValueFrom } from 'rxjs';
+import { filter, timeout } from 'rxjs/operators';
+import { UserProfile, UserRole } from '../models/user-profile.model';
+import { AuthService } from './auth.service';
+import { Auth, authState } from '@angular/fire/auth';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
   private readonly firestore = inject(Firestore);
+  private readonly authService = inject(AuthService);
+  private readonly auth = inject(Auth);
 
   listenToProfile(uid: string): Observable<UserProfile | null> {
     const reference = doc(this.firestore, 'users', uid) as DocumentReference<UserProfile>;
@@ -59,5 +65,69 @@ export class ProfileService {
     return Array.from({ length: 6 })
       .map(() => dictionary[Math.floor(Math.random() * dictionary.length)])
       .join('');
+  }
+
+  /**
+   * Get the current user's role from their profile in the database
+   * Returns 'patient' if profile doesn't exist or role is not set
+   * Waits for auth state to be ready if needed
+   */
+  async getCurrentUserRole(): Promise<UserRole> {
+    // First try to get user from signal (fast path)
+    let user = this.authService.user();
+    
+    // If signal is not ready yet, wait for auth state
+    if (!user) {
+      try {
+        user = await firstValueFrom(
+          authState(this.auth).pipe(
+            timeout({ first: 3000, with: () => of(null) }),
+            filter((u) => u !== null)
+          )
+        ).catch(() => null);
+      } catch (error) {
+        console.error('Error waiting for auth state:', error);
+        return 'patient';
+      }
+    }
+
+    if (!user) {
+      return 'patient';
+    }
+
+    try {
+      const reference = doc(this.firestore, 'users', user.uid) as DocumentReference<UserProfile>;
+      const snapshot = await getDoc(reference);
+      if (!snapshot.exists()) {
+        return 'patient';
+      }
+      const profile = snapshot.data();
+      return profile?.role ?? 'patient';
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+      return 'patient';
+    }
+  }
+
+  /**
+   * Observable that emits the current user's role from their profile
+   * Returns 'patient' if user is not authenticated or profile doesn't exist
+   */
+  getCurrentUserRole$(): Observable<UserRole> {
+    const user = this.authService.user();
+    if (!user) {
+      return of('patient' as UserRole);
+    }
+    return this.listenToProfile(user.uid).pipe(
+      map((profile) => profile?.role ?? 'patient')
+    );
+  }
+
+  /**
+   * Check if the current user is a provider
+   */
+  async isProvider(): Promise<boolean> {
+    const role = await this.getCurrentUserRole();
+    return role === 'provider';
   }
 }

@@ -63,6 +63,7 @@
   "provider": {
     "dashboard": "Dashibodi ya Mtoa Huduma",
     "managePatients": "Simamia wagonjwa wako",
+    "patients": "Wateja",
     "searchPatients": "Tafuta Wagonjwa",
     "searchByName": "Tafuta kwa jina la mgonjwa...",
     "findByNameOrCode": "Tafuta kwa jina au msimbo wa kushiriki",
@@ -85,7 +86,13 @@
     "viewPatient": "Tazama mgonjwa",
     "registerAnother": "Sajili mgonjwa mwingine",
     "emailForLogin": "Barua pepe hii itatumika na mgonjwa kuingia.",
-    "passwordForLogin": "Weka nywila rahisi ya muda ambayo unaweza kushiriki na mgonjwa."
+    "passwordForLogin": "Weka nywila rahisi ya muda ambayo unaweza kushiriki na mgonjwa.",
+    "profileDescription": "Tumia \"Wateja Wangu\" kutafuta kwa jina au msimbo wa kushiriki, kisha nenda kwenye Leo/Rekodi ili kuwasaidia kurekodi maingizo.",
+    "facilityName": "Jina la Kituo",
+    "providerType": "Aina ya Mtoa Huduma",
+    "facilityNamePlaceholder": "mfano, Kituo cha Afya",
+    "providerTypePlaceholder": "mfano, Muuguzi, Daktari",
+    "noProfileData": "Hakuna data ya wasifu."
   },
   "record": {
     "when": "Lini?",
@@ -224,6 +231,15 @@
   "languages": {
     "en": "Kiingereza",
     "sw": "Kiswahili"
+  },
+  "nav": {
+    "myHealth": "Afya Yangu",
+    "provider": "Mtoa Huduma"
+  },
+  "profile": {
+    "edit": "Hariri",
+    "editProfile": "Hariri Wasifu",
+    "displayNameRequired": "Jina la kuonyesha linahitajika"
   }
 }
 

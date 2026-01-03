@@ -1,30 +1,98 @@
 <section class="space-y-4 p-4" *ngIf="profile(); else empty">
-  <div class="flex items-center gap-3">
-    <div class="w-16 h-16 rounded-2xl bg-brand-gradient flex items-center justify-center text-2xl text-white font-bold">
-      {{ profile()?.displayName?.[0] || 'U' }}
+  <!-- View Mode -->
+  <div *ngIf="!isEditMode()">
+    <div class="flex items-center gap-3">
+      <div class="w-16 h-16 rounded-2xl bg-brand-gradient flex items-center justify-center text-2xl text-white font-bold">
+        {{ profile()?.displayName?.[0] || 'U' }}
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-[0.4em] text-muted">{{ 'auth.provider' | translate }}</p>
+        <h2 class="text-2xl font-semibold text-ink">{{ profile()?.displayName }}</h2>
+        <p class="text-sm text-muted">{{ displayEmail() }}</p>
+      </div>
     </div>
-    <div>
-      <p class="text-xs uppercase tracking-[0.4em] text-muted">Provider</p>
-      <h2 class="text-2xl font-semibold text-ink">{{ profile()?.displayName }}</h2>
-      <p class="text-sm text-muted">{{ displayEmail() }}</p>
+
+    <div class="rounded-2xl bg-surface-muted/60 p-4 space-y-2">
+      <p class="text-sm text-muted">{{ 'provider.profileDescription' | translate }}</p>
+      <div class="grid grid-cols-2 gap-2 text-sm text-muted">
+        <span>{{ 'auth.language' | translate }}</span>
+        <span class="text-ink font-semibold">{{ profile()?.lang | uppercase }}</span>
+        <span>{{ 'auth.phone' | translate }}</span>
+        <span class="text-ink font-semibold">{{ profile()?.phone || '—' }}</span>
+        <span *ngIf="profile()?.facilityName">{{ 'provider.facilityName' | translate }}</span>
+        <span *ngIf="profile()?.facilityName" class="text-ink font-semibold">{{ profile()?.facilityName }}</span>
+        <span *ngIf="profile()?.providerType">{{ 'provider.providerType' | translate }}</span>
+        <span *ngIf="profile()?.providerType" class="text-ink font-semibold">{{ profile()?.providerType }}</span>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button type="button" class="pill-button flex-1 text-lg" (click)="startEdit()">
+        {{ 'profile.edit' | translate }}
+      </button>
+      <button type="button" class="pill-button--danger flex-1 text-lg" (click)="logout()">
+        {{ 'auth.logout' | translate }}
+      </button>
     </div>
   </div>
 
-  <div class="rounded-2xl bg-surface-muted/60 p-4 space-y-2">
-    <p class="text-sm text-muted">Use “My Patients” to search by name or share code, then jump into Today/Record to help them log entries.</p>
-    <div class="grid grid-cols-2 gap-2 text-sm text-muted">
-      <span>Language</span>
-      <span class="text-ink font-semibold">{{ profile()?.lang | uppercase }}</span>
-      <span>Phone</span>
-      <span class="text-ink font-semibold">{{ profile()?.phone || '—' }}</span>
+  <!-- Edit Mode -->
+  <form *ngIf="isEditMode()" [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="w-16 h-16 rounded-2xl bg-brand-gradient flex items-center justify-center text-2xl text-white font-bold">
+        {{ profileForm.get('displayName')?.value?.[0] || 'U' }}
+      </div>
+      <div class="flex-1">
+        <p class="text-xs uppercase tracking-[0.4em] text-muted">{{ 'auth.provider' | translate }}</p>
+        <h2 class="text-2xl font-semibold text-ink">{{ 'profile.editProfile' | translate }}</h2>
+        <p class="text-sm text-muted">{{ displayEmail() }}</p>
+      </div>
     </div>
-  </div>
 
-  <button type="button" class="pill-button w-full text-lg" (click)="logout()">Log out</button>
+    <label class="field">
+      <span>{{ 'auth.displayName' | translate }}</span>
+      <input formControlName="displayName" type="text" class="input" [class.border-red-500]="profileForm.get('displayName')?.invalid && profileForm.get('displayName')?.touched" [class.ring-red-500]="profileForm.get('displayName')?.invalid && profileForm.get('displayName')?.touched">
+      <span *ngIf="profileForm.get('displayName')?.invalid && profileForm.get('displayName')?.touched" class="text-xs text-red-500">
+        {{ 'profile.displayNameRequired' | translate }}
+      </span>
+    </label>
+
+    <label class="field">
+      <span>{{ 'auth.phone' | translate }}</span>
+      <input formControlName="phone" type="tel" class="input" placeholder="+255...">
+    </label>
+
+    <label class="field">
+      <span>{{ 'auth.language' | translate }}</span>
+      <select formControlName="lang" class="input">
+        <option value="en">{{ 'languages.en' | translate }}</option>
+        <option value="sw">{{ 'languages.sw' | translate }}</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span>{{ 'provider.facilityName' | translate }}</span>
+      <input formControlName="facilityName" type="text" class="input" [placeholder]="'provider.facilityNamePlaceholder' | translate">
+    </label>
+
+    <label class="field">
+      <span>{{ 'provider.providerType' | translate }}</span>
+      <input formControlName="providerType" type="text" class="input" [placeholder]="'provider.providerTypePlaceholder' | translate">
+    </label>
+
+    <div class="flex gap-2">
+      <button type="button" class="pill-button--white flex-1 text-lg" (click)="cancelEdit()" [disabled]="isSaving()">
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button type="submit" class="pill-button flex-1 text-lg" [disabled]="isSaving() || profileForm.invalid">
+        {{ isSaving() ? ('common.saving' | translate) : ('common.save' | translate) }}
+      </button>
+    </div>
+  </form>
 </section>
 
 <ng-template #empty>
   <div class="rounded-2xl border border-dashed border-border/70 p-6 text-center text-muted">
-    No profile data.
+    {{ 'provider.noProfileData' | translate }}
   </div>
 </ng-template>

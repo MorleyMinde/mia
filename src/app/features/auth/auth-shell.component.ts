@@ -8,7 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ContextService } from '../../core/services/context.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { LanguageService } from '../../core/services/language.service';
-import { Condition, LanguageCode, PatientProfile, ProviderProfile, UserRole } from '../../core/models/user-profile.model';
+import { Condition, LanguageCode, PatientProfile } from '../../core/models/user-profile.model';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 
 @Component({
@@ -27,7 +27,6 @@ export class AuthShellComponent {
   private readonly languageService = inject(LanguageService);
   private readonly router = inject(Router);
 
-  readonly selectedRole = signal<UserRole>('patient');
   readonly mode = signal<'signin' | 'signup'>('signin');
   readonly status = signal<'idle' | 'loading' | 'error' | 'success'>('idle');
   readonly errorMessage = signal<string | null>(null);
@@ -49,8 +48,8 @@ export class AuthShellComponent {
 
   constructor() {
     effect(() => {
-      const isPatientSignup = this.selectedRole() === 'patient' && this.mode() === 'signup';
-      if (isPatientSignup) {
+      // Always generate share code for patient signup (all signups are patients)
+      if (this.mode() === 'signup') {
         const shareCode = this.profileService.generateShareCode();
         this.onboardingForm.patchValue({ shareCode });
       }
@@ -70,10 +69,6 @@ export class AuthShellComponent {
     this.onboardingForm.get('language')?.valueChanges.subscribe((lang: LanguageCode) => {
       this.languageService.setLanguage(lang as 'en' | 'sw');
     });
-  }
-
-  selectRole(role: UserRole) {
-    this.selectedRole.set(role);
   }
 
   toggleMode() {
@@ -96,11 +91,16 @@ export class AuthShellComponent {
         : await firstValueFrom(this.authService.signInWithEmail(email, password));
 
       if (this.mode() === 'signup') {
+        // Always create patient profile on signup
         await this.persistProfile(user.uid);
       }
 
-      this.contextService.setRole(this.selectedRole());
-      await this.router.navigate([this.selectedRole() === 'patient' ? '/patient' : '/provider']);
+      // Get role directly from database (don't rely on context which might not be updated yet)
+      const role = await this.profileService.getCurrentUserRole();
+      // Update context for future use
+      await this.contextService.refreshRoleFromProfile();
+      // Route based on actual role from database
+      await this.router.navigate([role === 'provider' ? '/provider' : '/patient']);
       this.status.set('success');
     } catch (error: any) {
       console.error(error);
@@ -114,10 +114,15 @@ export class AuthShellComponent {
     try {
       const user = await firstValueFrom(this.authService.signInWithGoogle());
       if (this.mode() === 'signup') {
+        // Always create patient profile on signup
         await this.persistProfile(user.uid);
       }
-      this.contextService.setRole(this.selectedRole());
-      await this.router.navigate([this.selectedRole() === 'patient' ? '/patient' : '/provider']);
+      // Get role directly from database (don't rely on context which might not be updated yet)
+      const role = await this.profileService.getCurrentUserRole();
+      // Update context for future use
+      await this.contextService.refreshRoleFromProfile();
+      // Route based on actual role from database
+      await this.router.navigate([role === 'provider' ? '/provider' : '/patient']);
       this.status.set('success');
     } catch (error: any) {
       console.error(error);
@@ -129,34 +134,21 @@ export class AuthShellComponent {
   private async persistProfile(uid: string) {
     const raw = this.onboardingForm.getRawValue();
     const timestamp = new Date();
-    if (this.selectedRole() === 'patient') {
-      const patientProfile: PatientProfile = {
-        uid,
-        role: 'patient',
-        displayName: raw.displayName,
-        displayNameLower: raw.displayName.toLowerCase(),
-        lang: raw.language,
-        phone: raw.phone ?? undefined,
-        shareCode: raw.shareCode,
-        yearOfBirth: raw.yearOfBirth ? Number(raw.yearOfBirth) : undefined,
-        conditions: this.extractConditions(raw.conditions),
-        createdAt: timestamp,
-        updatedAt: timestamp
-      };
-      await this.profileService.upsertProfile(patientProfile);
-    } else {
-      const providerProfile: ProviderProfile = {
-        uid,
-        role: 'provider',
-        displayName: raw.displayName,
-        displayNameLower: raw.displayName.toLowerCase(),
-        lang: raw.language,
-        phone: raw.phone ?? undefined,
-        createdAt: timestamp,
-        updatedAt: timestamp
-      };
-      await this.profileService.upsertProfile(providerProfile);
-    }
+    // Always create patient profile on signup
+    const patientProfile: PatientProfile = {
+      uid,
+      role: 'patient',
+      displayName: raw.displayName,
+      displayNameLower: raw.displayName.toLowerCase(),
+      lang: raw.language,
+      phone: raw.phone ?? undefined,
+      shareCode: raw.shareCode,
+      yearOfBirth: raw.yearOfBirth ? Number(raw.yearOfBirth) : undefined,
+      conditions: this.extractConditions(raw.conditions),
+      createdAt: timestamp,
+      updatedAt: timestamp
+    };
+    await this.profileService.upsertProfile(patientProfile);
   }
 
   private extractConditions(group: { [key: string]: any }): Condition[] {

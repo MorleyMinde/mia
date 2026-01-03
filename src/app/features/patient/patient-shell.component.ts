@@ -19,12 +19,16 @@ export class PatientShellComponent {
   private readonly router = inject(Router);
   private readonly context = inject(ContextService);
 
-  readonly navItems = [
-    { label: 'patient.today', icon: '🟢', path: '/patient' },
-    { label: 'patient.history', icon: '📅', path: '/patient/history' },
-    { label: 'patient.insights', icon: '💡', path: '/patient/insights' },
-    { label: 'auth.profile', icon: '🙂', path: '/patient/profile' }
+  // My Health section navigation
+  readonly myHealthNavItems = [
+    { label: 'patient.today', icon: '🟢', path: '/patient', section: 'my-health' },
+    { label: 'patient.record', icon: '✍️', path: '/patient/record', section: 'my-health' },
+    { label: 'patient.history', icon: '📅', path: '/patient/history', section: 'my-health' },
+    { label: 'patient.insights', icon: '💡', path: '/patient/insights', section: 'my-health' },
+    { label: 'auth.profile', icon: '🙂', path: '/patient/profile', section: 'my-health' }
   ];
+
+  readonly navItems = this.myHealthNavItems;
 
   readonly userInitial = computed(() => (this.authService.user()?.displayName?.[0] || 'U').toUpperCase());
 

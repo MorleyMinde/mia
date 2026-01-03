@@ -6,23 +6,6 @@
     <app-language-switcher />
   </div>
 
-  <div class="rounded-full bg-surface-muted/60 p-1 flex">
-    <button type="button"
-            class="flex-1 rounded-full py-2 text-sm font-semibold transition"
-            [class.bg-surface]="selectedRole() === 'patient'"
-            [class.text-ink]="selectedRole() === 'patient'"
-            (click)="selectRole('patient')">
-      {{ 'auth.patient' | translate }}
-    </button>
-    <button type="button"
-            class="flex-1 rounded-full py-2 text-sm font-semibold transition"
-            [class.bg-surface]="selectedRole() === 'provider'"
-            [class.text-ink]="selectedRole() === 'provider'"
-            (click)="selectRole('provider')">
-      {{ 'auth.provider' | translate }}
-    </button>
-  </div>
-
   <div class="flex justify-center">
     <button class="text-xs text-brand font-semibold underline" (click)="toggleMode()">
       {{ (mode() === 'signup' ? 'auth.signInPrompt' : 'auth.signUpPrompt') | translate }}
@@ -62,12 +45,12 @@
       </label>
     </div>
 
-    <label class="field" *ngIf="selectedRole() === 'patient' && mode() === 'signup'">
+    <label class="field" *ngIf="mode() === 'signup'">
       <span>{{ 'auth.yearOfBirth' | translate }}</span>
         <input formControlName="yearOfBirth" type="number" min="1930" max="2020" class="input">
       </label>
 
-    <div class="rounded-2xl border border-border/70 p-3 space-y-2 text-sm" *ngIf="selectedRole() === 'patient' && mode() === 'signup'" formGroupName="conditions">
+    <div class="rounded-2xl border border-border/70 p-3 space-y-2 text-sm" *ngIf="mode() === 'signup'" formGroupName="conditions">
       <div class="flex items-center justify-between text-xs uppercase tracking-wide">
         <span class="text-muted">{{ 'auth.conditions' | translate }}</span>
         <span class="text-brand font-semibold">{{ 'common.code' | translate }}: {{ onboardingForm.get('shareCode')?.value || '••••••' }}</span>

@@ -1,12 +1,14 @@
 import { Routes } from '@angular/router';
 import { redirectLoggedInGuard } from './core/guards/redirect-auth.guard';
 import { authRequiredGuard } from './core/guards/auth-required.guard';
+import { providerRequiredGuard } from './core/guards/provider-required.guard';
+import { rootRedirectGuard } from './core/guards/root-redirect.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'auth',
-    pathMatch: 'full'
+    canActivate: [rootRedirectGuard],
+    children: []
   },
   {
     path: 'auth',
@@ -42,7 +44,7 @@ export const routes: Routes = [
   },
   {
     path: 'provider',
-    canMatch: [authRequiredGuard],
+    canMatch: [authRequiredGuard, providerRequiredGuard],
     loadComponent: () => import('./features/provider/provider-shell.component').then((m) => m.ProviderShellComponent),
     children: [
       {

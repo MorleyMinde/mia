@@ -98,6 +98,50 @@
     @apply text-accent-foreground;
   }
 
+  .pill-button--danger {
+    border-radius: var(--radius-pill);
+    @apply px-6 py-3 font-semibold text-sm uppercase tracking-wide text-white;
+    background-color: rgb(var(--color-danger));
+    box-shadow: 0 18px 45px rgba(231, 76, 60, 0.25);
+  }
+
+  .pill-button--danger:hover {
+    background-color: rgb(var(--color-danger) / 0.9);
+  }
+
+  .pill-button--white {
+    border-radius: var(--radius-pill);
+    @apply px-6 py-3 font-semibold text-sm uppercase tracking-wide border-2;
+    background-color: rgb(var(--color-surface));
+    color: rgb(var(--color-ink));
+    border-color: rgb(var(--color-border));
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .pill-button--white:hover {
+    background-color: rgb(var(--color-surface-alt));
+  }
+
+  .pill-button--white:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  [data-theme="dark"] .pill-button--danger {
+    box-shadow: 0 25px 55px rgba(255, 119, 117, 0.3);
+  }
+
+  [data-theme="dark"] .pill-button--white {
+    background-color: rgb(var(--color-surface));
+    color: rgb(var(--color-ink));
+    border-color: rgb(var(--color-border));
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  [data-theme="dark"] .pill-button--white:hover {
+    background-color: rgb(var(--color-surface-alt));
+  }
+
   .card {
     @apply bg-surface rounded-xl shadow-brand-soft border border-border/60 p-6;
   }
